@@ -1,3 +1,4 @@
+"""Cryptographic applications library based on the RSA algorithm."""
 from Crypto.PublicKey import RSA
 from Crypto.Signature import pkcs1_15
 from Crypto.Cipher import PKCS1_OAEP
@@ -23,15 +24,15 @@ def generate_keys(keylength: int = DEFAULT_KEY_LENGTH):
     if not keylength:
         keylength = DEFAULT_KEY_LENGTH
     key = RSA.generate(keylength)
-    public_key = key.publickey().export_key()
-    private_key = key.export_key()
+    public_key = key.publickey().export_key(format='DER')
+    private_key = key.export_key(format='DER')
 
     return (bytearray(public_key), bytearray(private_key))
 
 
 def derive_public_key(private_key: bytearray):
     private_key_obj = RSA.import_key(private_key)
-    return bytearray(private_key_obj.publickey().export_key())
+    return bytearray(private_key_obj.publickey().export_key(format='DER'))
 
 
 def encrypt(data_to_encrypt: bytearray, public_key: bytearray, encryption_options=DEFAULT_ENCRYPTION_OPTION):

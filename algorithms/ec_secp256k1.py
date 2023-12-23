@@ -1,17 +1,9 @@
-"""
-Cryptographic applications library based on elliptic curve cryptography.
-Can be used for asymmetric and symmetric cryptography, signature verification,
-and supports password-secured cryptography.
-Built on the eciespy, coincurve and hashlib modules.
-"""
+"""Cryptographic applications library based on elliptic curve cryptography."""
 
-import hashlib
-import os
-import traceback
+
 from ecies.utils import generate_key
 import ecies
 import coincurve
-from cryptography.fernet import Fernet
 from errors import EncryptionOptionError, SignatureOptionError
 
 FAMILY_NAME = "EC-secp256k1"

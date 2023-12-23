@@ -1,20 +1,34 @@
-import multi_crypt
-from multi_crypt import encrypt, decrypt, sign, verify_signature, generate_keys, derive_public_key
-from termcolor import colored as coloured
+"""Automated tests for multi_crypt"""
+
 from datetime import datetime
+from termcolor import colored as coloured
+import multi_crypt
+from multi_crypt import (
+    generate_keys, derive_public_key,
+    encrypt, decrypt,
+    sign, verify_signature
+)
+# pylint: disable=missing-function-docstring
+# pylint: disable=global-statement
+
 PYTEST = False
 BREAKPOINTS = False
 
 
 def mark(success, message, duration):
-    """Returns a check or cross character depending on the input success."""
+    """Prints a test report comprising of check or cross depending on the input
+    test success along with the provided message."""
     if success:
-        mark = coloured("✓", "green")
+        mark_symbol = coloured("✓", "green")
     else:
-        mark = coloured("✗", "red")
+        mark_symbol = coloured("✗", "red")
         if BREAKPOINTS:
             breakpoint()
-    print(mark, message, coloured(str(round(duration.total_seconds()*100000)/100)+"ms", "yellow"))
+    print(
+        mark_symbol,
+        message,
+        coloured(str(round(duration.total_seconds()*100000)/100)+"ms", "yellow")
+    )
     if PYTEST and not success:
         raise Exception(f'Failed {message}')
     return success
@@ -36,7 +50,7 @@ def test_key_generation_derivation(family, ):
 
 def test_encryption_decryption(family, encryption_options=None):
     public_key, private_key = generate_keys(family, )
-    original_data = b"Hello, World!"
+    original_data = b"Hello there!"
 
     start_time = datetime.utcnow()
     encrypted_data = encrypt(family, original_data,
@@ -52,17 +66,24 @@ def test_encryption_decryption(family, encryption_options=None):
 
 
 def test_signing_verification(family, signature_options=None):
-    start_time = datetime.utcnow()
     public_key, private_key = generate_keys(family, )
-    original_data = b"Hello, World!"
+    data = b"Hello there!"
+    alt_data = b"Hello, World!"
 
-    signature = sign(family, original_data, private_key, signature_options)
+    start_time = datetime.utcnow()
+    signature = sign(family, data, private_key, signature_options)
     is_verified = verify_signature(
-        family, signature, original_data, public_key, signature_options)
+        family, signature, data, public_key, signature_options
+    )
     duration = (datetime.utcnow() - start_time)
 
+    alt_signature = sign(family, alt_data, private_key, signature_options)
+    # this verification should return False
+    is_verified_alt = verify_signature(
+        family, alt_signature, data, public_key, signature_options
+    )
     mark(
-        is_verified,
+        is_verified and not is_verified_alt,
         f"{family}-{signature_options}: Signing & Verification",
         duration
     )

@@ -3,22 +3,11 @@ It is the single interface to the multitude of cryptographic algorithms living
 in ./algorithms.
 """
 import os
-import sys
-import importlib
+
+from utils import load_module_from_path
+
 
 crypto_modules = dict()
-
-
-def load_module_from_path(path):
-    module_name = os.path.basename(path).strip(".py")
-    if os.path.isdir(path):
-        path = os.path.join(path, '__init__.py')
-    spec = importlib.util.spec_from_file_location(
-        module_name, path)
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[module_name] = module
-    spec.loader.exec_module(module)
-    return module
 
 
 # load all cryptographic family modules from the algorithms folder
