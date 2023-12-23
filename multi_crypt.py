@@ -22,7 +22,7 @@ for filename in os.listdir("algorithms"):
     crypto_modules.update({module.FAMILY_NAME: module})
 
 
-def generate_keys(family: str, keylength: int = None):
+def generate_keys(family: str, **kwargs):
     """Generate a pair of public and private keys to be used with the specified
     family.
     Parameters:
@@ -31,7 +31,7 @@ def generate_keys(family: str, keylength: int = None):
     Returns:
         tuple: tuple of bytearrays, a public key and a private key
     """
-    return crypto_modules[family].generate_keys(keylength)
+    return crypto_modules[family].generate_keys(**kwargs)
 
 
 def derive_public_key(
