@@ -90,17 +90,17 @@ def sign(
 
 def verify_signature(
     family: str,
+    signature: bytearray,
     data: bytearray,
     public_key: bytearray,
-    signature: bytearray,
     signature_options: str = None
 ):
     """Verify the provided signature of the provided data using the specified
     private key.
     Parameters:
+        signature (bytearray): the signaure to verify
         data (bytearray): the data to sign
         public_key (bytearray): the public key to verify the signature against
-        signature (bytearray): the signaure to verify
         signature_options (str): specification code for which
                                 signature/verification protocol should be used
     Returns:

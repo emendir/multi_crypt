@@ -128,9 +128,9 @@ def sign(
 
 def verify_signature(
     family: str,
+    signature: bytearray,
     data: bytearray,
     public_key: bytearray,
-    signature: bytearray,
     signature_options: str = None
 ):
     """Verify the provided signature of the provided data using the specified
@@ -138,18 +138,18 @@ def verify_signature(
     Parameters:
         family (str): the cryptographic family to be used for the signature
                     verification
+        signature (bytearray): the signaure to verify
         data (bytearray): the data to sign
         public_key (bytearray): the public key to verify the signature against
-        signature (bytearray): the signaure to verify
         signature_options (str): specification code for which
                                 signature/verification protocol should be used
     Returns:
         bool: whether or not the signature matches the data
     """
     return crypto_modules[family].verify_signature(
+        signature,
         data,
         public_key,
-        signature,
         signature_options
     )
 

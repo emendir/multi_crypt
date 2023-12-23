@@ -80,7 +80,12 @@ def sign(data: bytes, private_key: bytearray, signature_options=""):
     return key.sign(data)
 
 
-def verify_signature(data: bytes, public_key: bytes, signature: bytes, signature_options=""):
+def verify_signature(
+    signature: bytes,
+    data: bytes,
+    public_key: bytes,
+    signature_options=""
+):
     if isinstance(public_key, str):
         public_key = bytes(bytearray.fromhex(public_key))
     elif isinstance(public_key, bytearray):

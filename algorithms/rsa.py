@@ -75,7 +75,11 @@ def sign(data: bytearray, private_key: bytearray, signature_options=DEFAULT_SIGN
         raise SignatureOptionError(signature_options)
 
 
-def verify_signature(data: bytearray, public_key: bytearray, signature: bytearray, signature_options=DEFAULT_SIGNATURE_OPTION):
+def verify_signature(
+        signature: bytearray,
+        data: bytearray,
+        public_key: bytearray,
+        signature_options=DEFAULT_SIGNATURE_OPTION):
     if not signature_options:
         signature_options = DEFAULT_SIGNATURE_OPTION
     if signature_options == "SHA256-PKCS1_15":

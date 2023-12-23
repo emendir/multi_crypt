@@ -20,6 +20,20 @@ def mark(success, message, duration):
     return success
 
 
+def test_key_generation_derivation(family, ):
+    start_time = datetime.utcnow()
+    public_key, private_key = generate_keys(family, )
+
+    derived_pubkey = derive_public_key(family, private_key)
+    duration = (datetime.utcnow() - start_time)
+
+    mark(
+        derived_pubkey == public_key,
+        f"{family}: Private Key Check",
+        duration
+    )
+
+
 def test_encryption_decryption(family, encryption_options=None):
     public_key, private_key = generate_keys(family, )
     original_data = b"Hello, World!"
@@ -44,26 +58,12 @@ def test_signing_verification(family, signature_options=None):
 
     signature = sign(family, original_data, private_key, signature_options)
     is_verified = verify_signature(
-        family, original_data, public_key, signature, signature_options)
+        family, signature, original_data, public_key, signature_options)
     duration = (datetime.utcnow() - start_time)
 
     mark(
         is_verified,
         f"{family}-{signature_options}: Signing & Verification",
-        duration
-    )
-
-
-def test_key_generation_derivation(family, ):
-    start_time = datetime.utcnow()
-    public_key, private_key = generate_keys(family, )
-
-    derived_pubkey = derive_public_key(family, private_key)
-    duration = (datetime.utcnow() - start_time)
-
-    mark(
-        derived_pubkey == public_key,
-        f"{family}: Private Key Check",
         duration
     )
 
