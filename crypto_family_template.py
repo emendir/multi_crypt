@@ -40,19 +40,17 @@ def generate_keys(keylength: int = DEFAULT_KEY_LENGTH):
     return (public_key, private_key)
 
 
-def check_private_key(
-    public_key: bytearray,
+def derive_public_key(
     private_key: bytearray
 ):
-    """Check if the provided private key corresponds to the provided public key.
+    """Given a private key, generate the corresponding public key.
     Parameters:
-        public_key (bytearray): the public key
         private_key (bytearray): the private key
     Returns:
-        bool: whether the private key corresponds to the provided public key
+        bytearray: the public key
     """
-    match: bool
-    return match
+    public_key: bytearray
+    return public_key
 
 
 def encrypt(

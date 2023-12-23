@@ -45,20 +45,18 @@ def generate_keys(family: str, keylength: int = None):
     return crypto_modules[family].generate_keys(keylength)
 
 
-def check_private_key(
+def derive_public_key(
     family: str,
-    public_key: bytearray,
     private_key: bytearray
 ):
-    """Check if the provided private key corresponds to the provided public key.
+    """Given a private key, generate the corresponding public key.
     Parameters:
         family (str): the cryptographic family of the keys
-        public_key (bytearray): the public key
         private_key (bytearray): the private key
     Returns:
-        bool: whether the private key corresponds to the provided public key
+        bytearray: the public key
     """
-    return crypto_modules[family].check_private_key(public_key, private_key)
+    return crypto_modules[family].derive_public_key(private_key)
 
 
 def encrypt(

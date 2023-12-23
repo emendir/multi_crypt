@@ -39,13 +39,11 @@ def generate_keys(keylength: int = DEFAULT_KEY_LENGTH):
     return (public_key, private_key)
 
 
-def check_private_key(public_key: bytearray, private_key: bytearray):
+def derive_public_key(private_key: bytearray):
     if isinstance(private_key, bytes) or isinstance(private_key, bytearray):
         private_key = private_key.hex()
-    if isinstance(public_key, bytes) or isinstance(public_key, bytearray):
-        public_key = public_key.hex()
     key = coincurve.PrivateKey.from_hex(private_key)
-    return key.public_key.format(False).hex() == public_key
+    return key.public_key.format(False)
 
 
 def encrypt(data_to_encrypt: bytearray, public_key, encryption_options=""):

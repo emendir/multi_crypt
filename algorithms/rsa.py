@@ -29,11 +29,9 @@ def generate_keys(keylength: int = DEFAULT_KEY_LENGTH):
     return (bytearray(public_key), bytearray(private_key))
 
 
-def check_private_key(public_key: bytearray, private_key: bytearray):
-    public_key_obj = RSA.import_key(public_key)
+def derive_public_key(private_key: bytearray):
     private_key_obj = RSA.import_key(private_key)
-
-    return public_key_obj.publickey() == private_key_obj.publickey()
+    return bytearray(private_key_obj.publickey().export_key())
 
 
 def encrypt(data_to_encrypt: bytearray, public_key: bytearray, encryption_options=DEFAULT_ENCRYPTION_OPTION):

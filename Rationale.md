@@ -15,7 +15,7 @@ It hides away the complexity of hybrid cryptography while still giving the user 
 It provides exactly three pairs of functions to the user:
 - `encrypt` & `decrypt`
 - `sign` & `verify_signature`
-- `generate_keys` & `check_private_key`
+- `generate_keys` & `derive_public_key`
 
 Each of these functions takes the fundamental cryptographic algorithm family to be used as a parameter.
 `encrypt` and `decrypt` can additionally take a configuration string specifying additional algorithms and protocols to be used for hybrid encryption.
