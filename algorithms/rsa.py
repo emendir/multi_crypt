@@ -7,10 +7,10 @@ from errors import EncryptionOptionError, SignatureOptionError
 
 FAMILY_NAME = "RSA"
 
-encryption_options = [
+ENCRYPTION_OPTIONS = [
     "PKCS1_OAEP"
 ]
-signature_options = [
+SIGNATURE_OPTIONS = [
     "SHA256-PKCS1_15",
     "SHA512-PKCS1_15"
 ]
@@ -43,8 +43,7 @@ def encrypt(data_to_encrypt: bytearray, public_key: bytearray, encryption_option
         cipher = PKCS1_OAEP.new(key)
         encrypted_data = cipher.encrypt(data_to_encrypt)
         return bytearray(encrypted_data)
-    else:
-        raise EncryptionOptionError(encryption_options)
+    raise EncryptionOptionError(encryption_options)
 
 
 def decrypt(data_to_decrypt: bytearray, private_key: bytearray, encryption_options=DEFAULT_ENCRYPTION_OPTION):
@@ -67,13 +66,12 @@ def sign(data: bytearray, private_key: bytearray, signature_options=DEFAULT_SIGN
         h = SHA256.new(data)
         signature = pkcs1_15.new(key).sign(h)
         return bytearray(signature)
-    elif signature_options == "SHA512-PKCS1_15":
+    if signature_options == "SHA512-PKCS1_15":
         key = RSA.import_key(private_key)
         h = SHA512.new(data)
         signature = pkcs1_15.new(key).sign(h)
         return bytearray(signature)
-    else:
-        raise SignatureOptionError(signature_options)
+    raise SignatureOptionError(signature_options)
 
 
 def verify_signature(
@@ -104,8 +102,8 @@ def verify_signature(
 
 
 def get_encrytpion_options():
-    return encryption_options
+    return ENCRYPTION_OPTIONS
 
 
 def get_signature_options():
-    return signature_options
+    return SIGNATURE_OPTIONS

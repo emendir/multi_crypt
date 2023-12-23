@@ -16,10 +16,10 @@ multicrypt will detect and use it automatically.
 
 FAMILY_NAME = "TEMPLATE"
 
-encryption_options = [
+ENCRYPTION_OPTIONS = [
     ""
 ]
-signature_options = [
+SIGNATURE_OPTIONS = [
     ""
 ]
 
@@ -134,7 +134,7 @@ def get_encrytpion_options():
     Returns:
         list: a list of strings, the supported encryption options
     """
-    return encryption_options
+    return ENCRYPTION_OPTIONS
 
 
 def get_signature_options():
@@ -142,4 +142,4 @@ def get_signature_options():
     Returns:
         list: a list of strings, the supported signature options
     """
-    return signature_options
+    return SIGNATURE_OPTIONS
