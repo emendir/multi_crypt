@@ -1,8 +1,14 @@
 """Automated tests for crypt.Crypt's locking functionality"""
 
 from datetime import datetime
-from crypt import Crypt, LockedError
 from termcolor import colored as coloured
+
+if True:
+    import sys
+    import os
+    sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+
+    from multi_crypt import Crypt, LockedError
 
 # pylint: disable=missing-function-docstring
 # pylint: disable=global-statement
@@ -166,6 +172,8 @@ def test_unlocking(encryption_options=None, signature_options=None):
 
 
 def run_tests():
+    print("Running tests for Crypt locking:")
+
     test_create_encryptor(CRYPTO_FAMILY)
     test_encryption()
     test_decryption_locking()

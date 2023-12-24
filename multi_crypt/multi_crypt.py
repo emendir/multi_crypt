@@ -2,23 +2,16 @@
 It is the single interface to the multitude of cryptographic algorithms living
 in ./algorithms.
 """
-import os
 
-from utils import load_module_from_path
-
+from pkgutil import walk_packages
+from importlib import import_module
+from . import algorithms
 
 crypto_modules = dict()
 
-
 # load all cryptographic family modules from the algorithms folder
-for filename in os.listdir("algorithms"):
-    module_path = os.path.join("algorithms", filename)
-    init_file = os.path.join(module_path, "__init__.py")
-    if not (os.path.isfile(module_path) and filename[-3:] == ".py")    \
-            and not (os.path.exists(init_file) and os.path.isfile(init_file)):
-        continue
-
-    module = load_module_from_path(module_path)
+for loader, module_name, is_pkg in walk_packages(path=algorithms.__path__):
+    module = import_module(f"{algorithms.__name__}.{module_name}")
     crypto_modules.update({module.FAMILY_NAME: module})
 
 

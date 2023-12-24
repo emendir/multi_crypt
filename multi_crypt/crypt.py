@@ -3,8 +3,8 @@ to working with cryptography.
 For a functional approach, use multicrypt, with Crypt is based on.
 Crypt implements all the functionality of multi_crypt."""
 
-from utils import to_bytearray
-from multi_crypt import (  # pylint:disable=unused-import
+from .utils import to_bytearray
+from .multi_crypt import (  # pylint:disable=unused-import
     generate_keys, derive_public_key,
     encrypt, decrypt,
     sign, verify_signature,

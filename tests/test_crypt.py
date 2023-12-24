@@ -1,9 +1,15 @@
 """Automated tests for crypt.Crypt"""
 
 from datetime import datetime
-from crypt import Crypt
 from termcolor import colored as coloured
-from multi_crypt import derive_public_key
+
+if True:
+    import sys
+    import os
+    sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+
+    from multi_crypt import Crypt
+    from multi_crypt import derive_public_key
 
 # pylint: disable=missing-function-docstring
 # pylint: disable=global-statement
@@ -86,6 +92,7 @@ def test_signing_verification(signature_options=None):
 
 
 def run_tests():
+    print("Running tests for Crypt:")
     test_create_crypt(CRYPTO_FAMILY)
     test_encryption_decryption()
     test_signing_verification()

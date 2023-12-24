@@ -4,7 +4,7 @@
 from ecies.utils import generate_key
 import ecies
 import coincurve
-from errors import EncryptionOptionError, SignatureOptionError
+from ..errors import EncryptionOptionError, SignatureOptionError
 
 FAMILY_NAME = "EC-secp256k1"
 

@@ -2,12 +2,18 @@
 
 from datetime import datetime
 from termcolor import colored as coloured
-import multi_crypt
-from multi_crypt import (
-    generate_keys, derive_public_key,
-    encrypt, decrypt,
-    sign, verify_signature
-)
+
+if True:
+    import sys
+    import os
+    sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+
+    import multi_crypt
+    from multi_crypt import (
+        generate_keys, derive_public_key,
+        encrypt, decrypt,
+        sign, verify_signature
+    )
 # pylint: disable=missing-function-docstring
 # pylint: disable=global-statement
 
@@ -90,6 +96,8 @@ def test_signing_verification(family, signature_options=None):
 
 
 def run_tests():
+    print("Running tests for all algorithms:")
+
     for family in multi_crypt.get_all_families():
         test_key_generation_derivation(family, )
     for family in multi_crypt.get_encryption_families():
