@@ -8,7 +8,7 @@ import sys
 import importlib
 
 
-def to_bytearray(data, variable_name: str = "Value"):
+def to_bytearray(data, variable_name: str = "Value") -> bytearray:
     """Convert the input data from bytes or hex-string to bytearray,
     raising an error if it has the wrong type.
     Parameters:

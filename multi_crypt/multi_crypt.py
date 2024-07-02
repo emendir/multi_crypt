@@ -30,7 +30,7 @@ def generate_keys(family: str, **kwargs):
 def derive_public_key(
     family: str,
     private_key: bytearray
-):
+) -> bytearray:
     """Given a private key, generate the corresponding public key.
     Parameters:
         family (str): the cryptographic family of the keys
@@ -45,7 +45,7 @@ def encrypt(
     family: str,
     data_to_encrypt: bytearray,
     public_key: bytearray,
-    encryption_options: str = None
+    encryption_options: str | None = None
 ):
     """Encrypt the provided data using the specified public key and encryption
     family.
@@ -69,7 +69,7 @@ def decrypt(
     family: str,
     data_to_decrypt: bytearray,
     private_key: bytearray,
-    encryption_options: str = None
+    encryption_options: str | None = None
 ):
     """Decrypt the provided data using the specified private key and encryption
     family.
@@ -93,7 +93,7 @@ def sign(
     family: str,
     data: bytearray,
     private_key: bytearray,
-    signature_options: str = None
+    signature_options: str | None = None
 ):
     """Sign the provided data using the specified private key and family.
     Parameters:
@@ -113,7 +113,7 @@ def verify_signature(
     signature: bytearray,
     data: bytearray,
     public_key: bytearray,
-    signature_options: str = None
+    signature_options: str | None = None
 ):
     """Verify the provided signature of the provided data using the specified
     private key and family.

@@ -14,6 +14,9 @@ from .multi_crypt import (  # pylint:disable=unused-import
     get_encrytpion_options,
     get_signature_options,
 )
+from typing import Type, TypeVar
+
+_Crypt = TypeVar('_Crypt', bound='Crypt')
 
 
 class Crypt:
@@ -27,13 +30,13 @@ class Crypt:
     """
 
     public_key: bytearray
-    private_key: bytearray
+    private_key: bytearray | None
 
     def __init__(
         self,
         family: str,
-        private_key: bytearray = None,
-        public_key: bytearray = None
+        private_key: bytearray | None = None,
+        public_key: bytearray | None = None
     ):
         """Create a Crypt object for an existing set of cryptographic keys.
 
@@ -70,7 +73,7 @@ class Crypt:
             )
 
     @staticmethod
-    def new(family: str, keylength: int = None):
+    def new(family: str, keylength: int | None = None):
         """Create a Crypt object from a newly generated pair of public and
         private keys.
         Parameters:
@@ -84,6 +87,23 @@ class Crypt:
             family=family, keylength=keylength
         )
         return Crypt(family, private_key)
+
+    def serialise(self) -> dict:
+        """Serialise all this crypt's information, including its private key."""
+        return {
+            "family": self.family,
+            "private_key": self.private_key.hex(),
+            "public_key": self.public_key.hex(),
+        }
+
+    @classmethod
+    def deserialise(cls: Type[_Crypt], data: dict) -> _Crypt:
+        """Load a Crypt object from serialised data."""
+        return cls(
+            family=data["family"],
+            private_key=data["private_key"],
+            public_key=data["public_key"],
+        )
 
     def unlock(self, private_key):
         """Unlock the Crypt with a private key to enable decryption and signing
@@ -105,7 +125,7 @@ class Crypt:
     def encrypt(
         self,
         data_to_encrypt: bytearray,
-        encryption_options: str = None
+        encryption_options: str | None = None
     ):
         """Encrypt the provided data using the specified public key.
         Parameters:
@@ -125,7 +145,7 @@ class Crypt:
     def decrypt(
         self,
         encrypted_data: bytearray,
-        encryption_options: str = None
+        encryption_options: str | None = None
     ):
         """Decrypt the provided data using the specified private key.
         Parameters:
@@ -144,7 +164,7 @@ class Crypt:
             encryption_options=encryption_options
         )
 
-    def sign(self, data: bytes, signature_options: str = None):
+    def sign(self, data: bytes, signature_options: str | None = None):
         """Sign the provided data using the specified private key.
         Parameters:
             data (bytearray): the data to sign
@@ -158,7 +178,7 @@ class Crypt:
             raise LockedError()
         return sign(
             self.family,
-            data,
+            to_bytearray(data, "data"),
             self.private_key,
             signature_options=signature_options
         )
@@ -167,7 +187,7 @@ class Crypt:
         self,
         signature: bytes,
         data: bytes,
-        signature_options: str = None
+        signature_options: str | None = None
     ):
         """Verify the provided signature of the provided data using the specified
         private key.
@@ -182,8 +202,8 @@ class Crypt:
         """
         return verify_signature(
             self.family,
-            signature,
-            data,
+            to_bytearray(signature, "signature"),
+            to_bytearray(data, "data"),
             self.public_key,
             signature_options=signature_options
         )
