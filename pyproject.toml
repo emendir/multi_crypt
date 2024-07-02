@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+dynamic = ["dependencies"]
+name = "multi_crypt"
+authors = [{ name = "emendir" }]
+description = "A single unified interface for working with alternative cryptographic algorithms."
+version = "0.0.2"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["multi_crypt"]
+namespaces = false
