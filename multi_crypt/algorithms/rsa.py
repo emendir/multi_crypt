@@ -22,10 +22,10 @@ DEFAULT_SIGNATURE_OPTION = "SHA256-PKCS1_15"
 
 def generate_keys(keylength: int = DEFAULT_KEY_LENGTH):
     """Generate a pair of public and private keys.
-    Parameters:
+    Args:
         keylength (int): the number of bits the key is composed of
     Returns:
-        tuple: tuple of bytearrays, a public key and a private key
+        tuple: tuple of bytess, a public key and a private key
     """
     if not keylength:
         keylength = DEFAULT_KEY_LENGTH
@@ -33,33 +33,33 @@ def generate_keys(keylength: int = DEFAULT_KEY_LENGTH):
     public_key = key.publickey().export_key(format='DER')
     private_key = key.export_key(format='DER')
 
-    return (bytearray(public_key), bytearray(private_key))
+    return (public_key, private_key)
 
 
-def derive_public_key(private_key: bytearray):
+def derive_public_key(private_key: bytes):
     """Given a private key, generate the corresponding public key.
-    Parameters:
-        private_key (bytearray): the private key
+    Args:
+        private_key (bytes): the private key
     Returns:
-        bytearray: the public key
+        bytes: the public key
     """
     private_key_obj = RSA.import_key(private_key)
-    return bytearray(private_key_obj.publickey().export_key(format='DER'))
+    return private_key_obj.publickey().export_key(format='DER')
 
 
 def encrypt(
-    data_to_encrypt: bytearray,
-    public_key: bytearray,
+    data_to_encrypt: bytes,
+    public_key: bytes,
     encryption_options=DEFAULT_ENCRYPTION_OPTION
 ):
     """Encrypt the provided data using the specified public key.
-    Parameters:
-        data_to_encrypt (bytearray): the data to encrypt
-        public_key (bytearray): the public key to be used for the encryption
+    Args:
+        data_to_encrypt (bytes): the data to encrypt
+        public_key (bytes): the public key to be used for the encryption
         encryption_options (str): specification code for which
                                 encryption/decryption protocol should be used
     Returns:
-        bytearray: the encrypted data
+        bytes: the encrypted data
     """
     if not encryption_options:
         encryption_options = DEFAULT_ENCRYPTION_OPTION
@@ -67,23 +67,23 @@ def encrypt(
         key = RSA.import_key(public_key)
         cipher = PKCS1_OAEP.new(key)
         encrypted_data = cipher.encrypt(data_to_encrypt)
-        return bytearray(encrypted_data)
+        return encrypted_data
     raise EncryptionOptionError(encryption_options)
 
 
 def decrypt(
-    data_to_decrypt: bytearray,
-    private_key: bytearray,
+    data_to_decrypt: bytes,
+    private_key: bytes,
     encryption_options=DEFAULT_ENCRYPTION_OPTION
 ):
     """Decrypt the provided data using the specified private key.
-    Parameters:
-        data_to_decrypt (bytearray): the data to decrypt
-        private_key (bytearray): the private key to be used for the decryption
+    Args:
+        data_to_decrypt (bytes): the data to decrypt
+        private_key (bytes): the private key to be used for the decryption
         encryption_options (str): specification code for which
                                 encryption/decryption protocol should be used
     Returns:
-        bytearray: the encrypted data
+        bytes: the encrypted data
     """
     if not encryption_options:
         encryption_options = DEFAULT_ENCRYPTION_OPTION
@@ -91,23 +91,23 @@ def decrypt(
         key = RSA.import_key(private_key)
         cipher = PKCS1_OAEP.new(key)
         decrypted_data = cipher.decrypt(data_to_decrypt)
-        return bytearray(decrypted_data)
+        return decrypted_data
     raise EncryptionOptionError(encryption_options)
 
 
 def sign(
-    data: bytearray,
-    private_key: bytearray,
+    data: bytes,
+    private_key: bytes,
     signature_options=DEFAULT_SIGNATURE_OPTION
 ):
     """Sign the provided data using the specified private key.
-    Parameters:
-        data (bytearray): the data to sign
-        private_key (bytearray): the private key to be used for the signing
+    Args:
+        data (bytes): the data to sign
+        private_key (bytes): the private key to be used for the signing
         signature_options (str): specification code for which
                                 signature/verification protocol should be used
     Returns:
-        bytearray: the signature
+        bytes: the signature
     """
     if not signature_options:
         signature_options = DEFAULT_SIGNATURE_OPTION
@@ -115,26 +115,26 @@ def sign(
         key = RSA.import_key(private_key)
         data_hash = SHA256.new(data)
         signature = pkcs1_15.new(key).sign(data_hash)
-        return bytearray(signature)
+        return signature
     if signature_options == "SHA512-PKCS1_15":
         key = RSA.import_key(private_key)
         data_hash = SHA512.new(data)
         signature = pkcs1_15.new(key).sign(data_hash)
-        return bytearray(signature)
+        return signature
     raise SignatureOptionError(signature_options)
 
 
 def verify_signature(
-        signature: bytearray,
-        data: bytearray,
-        public_key: bytearray,
+        signature: bytes,
+        data: bytes,
+        public_key: bytes,
         signature_options=DEFAULT_SIGNATURE_OPTION):
     """Verify the provided signature of the provided data using the specified
     private key.
-    Parameters:
-        signature (bytearray): the signaure to verify
-        data (bytearray): the data to sign
-        public_key (bytearray): the public key to verify the signature against
+    Args:
+        signature (bytes): the signaure to verify
+        data (bytes): the data to sign
+        public_key (bytes): the public key to verify the signature against
         signature_options (str): specification code for which
                                 signature/verification protocol should be used
     Returns:

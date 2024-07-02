@@ -8,29 +8,33 @@ import sys
 import importlib
 
 
-def to_bytearray(data, variable_name: str = "Value") -> bytearray:
-    """Convert the input data from bytes or hex-string to bytearray,
-    raising an error if it has the wrong type.
-    Parameters:
+def to_bytes(
+    data: bytes | bytearray | str, variable_name: str = "Value"
+) -> bytes:
+    """Convert the input data from bytes or hex-string to bytes.
+
+    Raises an error if it has the wrong type.
+
+    Args:
         data: the data to convert
-        variable_name (str): for error message
+        variable_name: for error message
     """
 
-    if isinstance(data, bytearray):
-        return data
     if isinstance(data, bytes):
-        return bytearray(data)
+        return data
+    if isinstance(data, bytearray):
+        return bytes(data)
     if isinstance(data, str):
-        return bytearray.fromhex(data)
+        return bytes.fromhex(data)
     raise ValueError((
-        f"{variable_name} must be of type bytearray, bytes, or str, not "
+        f"{variable_name} must be of type bytes, bytes, or str, not "
         f"{type(data)}"
     ))
 
 
 def load_module_from_path(path: str):
     """Load a python module from a file or a folder.
-    Parameters:
+    Args:
         path (str): the path of the module file or folder
     Returns:
         module: the imported module
@@ -48,7 +52,7 @@ def load_module_from_path(path: str):
 
 def load_modules_from_package(package):
     """Given a package, imports all modules in that package.
-    Parameters:
+    Args:
         package (module): the already imported package whose modules need to be imported
     Returns:
         dict: a dictionary of the imported modules

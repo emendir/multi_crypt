@@ -1,20 +1,22 @@
 """This module contains Crypt, a class that enables an object-oriented approach
 to working with cryptography.
 For a functional approach, use multicrypt, with Crypt is based on.
-Crypt implements all the functionality of multi_crypt."""
+Crypt implements all the functionality of multi_crypt.
+"""
 
-from .utils import to_bytearray
+from typing import Type, TypeVar
+
 from .multi_crypt import (  # pylint:disable=unused-import
-    generate_keys, derive_public_key,
-    encrypt, decrypt,
-    sign, verify_signature,
-    get_all_families,
-    get_encryption_families,
-    get_signature_families,
+    decrypt,
+    derive_public_key,
+    encrypt,
+    generate_keys,
     get_encrytpion_options,
     get_signature_options,
+    sign,
+    verify_signature,
 )
-from typing import Type, TypeVar
+from .utils import to_bytes
 
 _Crypt = TypeVar('_Crypt', bound='Crypt')
 
@@ -29,14 +31,14 @@ class Crypt:
     this state to enable full functionality.
     """
 
-    public_key: bytearray
-    private_key: bytearray | None
+    public_key: bytes
+    private_key: bytes | None
 
     def __init__(
         self,
         family: str,
-        private_key: bytearray | None = None,
-        public_key: bytearray | None = None
+        private_key: bytes | None = None,
+        public_key: bytes | None = None
     ):
         """Create a Crypt object for an existing set of cryptographic keys.
 
@@ -45,11 +47,11 @@ class Crypt:
         supplying a public key only will enable only encryption and signature
         verification.
 
-        Parameters:
+        Args:
             family (str): the cryptographic family of the keys
-            private_key (bytearray): the private key. Required for the ability
+            private_key (bytes): the private key. Required for the ability
                                     to decrypt and sign data
-            public_key (bytearray): the public key. Not required if private_key
+            public_key (bytes): the public key. Not required if private_key
                                     is supplied
         Returns:
             Crypt: Crypt object for performing cryptographic operations
@@ -57,12 +59,12 @@ class Crypt:
         self.family = family
         if private_key:
             # type checking private key
-            self.private_key = to_bytearray(private_key, "private_key")
+            self.private_key = to_bytes(private_key, "private_key")
             self.public_key = derive_public_key(self.family, self.private_key)
         else:
             self.private_key = None
         if public_key:
-            public_key = to_bytearray(public_key, "private_key")
+            public_key = to_bytes(public_key, "private_key")
             if private_key:
                 if not self.public_key == public_key:
                     raise KeyMismatchError()
@@ -72,11 +74,13 @@ class Crypt:
                 "Either private_key or public_key must be supplied."
             )
 
-    @staticmethod
-    def new(family: str, keylength: int | None = None):
-        """Create a Crypt object from a newly generated pair of public and
-        private keys.
-        Parameters:
+    @classmethod
+    def new(
+        cls: Type[_Crypt], family: str, keylength: int | None = None
+    ) -> _Crypt:
+        """Create a Crypt from newly generated of public and private keys.
+
+        Args:
             family (str): the cryptographic family of the keys
             keylength (int): the number of bits the key is composed of
         Returns:
@@ -86,13 +90,22 @@ class Crypt:
         public_key, private_key = generate_keys(
             family=family, keylength=keylength
         )
-        return Crypt(family, private_key)
+        return cls(family, private_key)
 
-    def serialise(self) -> dict:
-        """Serialise all this crypt's information, including its private key."""
+    def serialise_private(self) -> dict:
+        """Serialise all this crypt's information including its private key."""
+        if not self.private_key:
+            raise LockedError()
         return {
             "family": self.family,
             "private_key": self.private_key.hex(),
+            "public_key": self.public_key.hex(),
+        }
+
+    def serialise_public(self) -> dict:
+        """Serialise this crypt's information, excluding its private key."""
+        return {
+            "family": self.family,
             "public_key": self.public_key.hex(),
         }
 
@@ -105,18 +118,18 @@ class Crypt:
             public_key=data["public_key"],
         )
 
-    def unlock(self, private_key):
-        """Unlock the Crypt with a private key to enable decryption and signing
-        if the Crypt was initiated with only a public key.
-        Parameters:
-            private_key (bytearray): the private key corresponding to this
+    def unlock(self, private_key: bytes | bytearray | str) -> None:
+        """Unlock the Crypt with a private key.
+
+        Args:
+            private_key (bytes): the private key corresponding to this
                                     Crypt's public key
         """
         # type checking private key
-        private_key = to_bytearray(private_key, "private_key")
+        private_key = to_bytes(private_key, "private_key")
 
         if derive_public_key(self.family, private_key) != self.public_key:
-            raise ValueError((
+            raise KeyMismatchError((
                 "Wrong private key! The given private key does not match this "
                 "encryptor's public key."
             ))
@@ -124,16 +137,17 @@ class Crypt:
 
     def encrypt(
         self,
-        data_to_encrypt: bytearray,
+        data_to_encrypt: bytes,
         encryption_options: str | None = None
-    ):
+    ) -> bytes:
         """Encrypt the provided data using the specified public key.
-        Parameters:
-            data_to_encrypt (bytearray): the data to encrypt
+
+        Args:
+            data_to_encrypt (bytes): the data to encrypt
             encryption_options (str): specification code for which
                                     encryption/decryption protocol should be used
         Returns:
-            bytearray: the encrypted data
+            bytes: the encrypted data
         """
         return encrypt(
             self.family,
@@ -144,16 +158,17 @@ class Crypt:
 
     def decrypt(
         self,
-        encrypted_data: bytearray,
+        encrypted_data: bytes,
         encryption_options: str | None = None
-    ):
+    ) -> bytes:
         """Decrypt the provided data using the specified private key.
-        Parameters:
-            data_to_decrypt (bytearray): the data to decrypt
+
+        Args:
+            encrypted_data (bytes): the data to decrypt
             encryption_options (str): specification code for which
                                     encryption/decryption protocol should be used
         Returns:
-            bytearray: the encrypted data
+            bytes: the encrypted data
         """
         if not self.private_key:
             raise LockedError()
@@ -164,21 +179,22 @@ class Crypt:
             encryption_options=encryption_options
         )
 
-    def sign(self, data: bytes, signature_options: str | None = None):
+    def sign(self, data: bytes, signature_options: str | None = None) -> bytes:
         """Sign the provided data using the specified private key.
-        Parameters:
-            data (bytearray): the data to sign
-            private_key (bytearray): the private key to be used for the signing
+
+        Args:
+            data (bytes): the data to sign
+            private_key (bytes): the private key to be used for the signing
             signature_options (str): specification code for which
-                                    signature/verification protocol should be used
+                                signature/verification protocol should be used
         Returns:
-            bytearray: the signature
+            bytes: the signature
         """
         if not self.private_key:
             raise LockedError()
         return sign(
             self.family,
-            to_bytearray(data, "data"),
+            to_bytes(data, "data"),
             self.private_key,
             signature_options=signature_options
         )
@@ -188,66 +204,60 @@ class Crypt:
         signature: bytes,
         data: bytes,
         signature_options: str | None = None
-    ):
-        """Verify the provided signature of the provided data using the specified
-        private key.
-        Parameters:
-            signature (bytearray): the signaure to verify
-            data (bytearray): the data to sign
-            public_key (bytearray): the public key to verify the signature against
+    ) -> bool:
+        """Verify the given signature of the given data using the given key.
+
+        Args:
+            signature (bytes): the signaure to verify
+            data (bytes): the data to sign
+            public_key (bytes): the public key to verify the signature against
             signature_options (str): specification code for which
-                                    signature/verification protocol should be used
+                                signature/verification protocol should be used
         Returns:
             bool: whether or not the signature matches the data
         """
         return verify_signature(
             self.family,
-            to_bytearray(signature, "signature"),
-            to_bytearray(data, "data"),
+            to_bytes(signature, "signature"),
+            to_bytes(data, "data"),
             self.public_key,
             signature_options=signature_options
         )
 
-    def get_private_key(self, key_type=bytearray):
-        """Returns the private key as the specified type."""
-        if key_type == bytearray:
-            return self.private_key
-        elif key_type == bytes:
-            return bytes(self.private_key)
-        elif key_type == str:
-            return self.private_key.hex()
-        else:
-            raise ValueError(
-                f"Unsupported type '{key_type}'. "
-                "Supported types: bytearray, bytes, str"
-            )
+    def get_private_key(self) -> bytes:
+        """Get the private key as bytes."""
+        if not self.private_key:
+            raise LockedError()
+        return self.private_key
 
-    def get_public_key(self, key_type=bytearray):
-        """Returns the private key as the specified type."""
-        if key_type == bytearray:
-            return self.public_key
-        elif key_type == bytes:
-            return bytes(self.public_key)
-        elif key_type == str:
-            return self.public_key.hex()
-        else:
-            raise ValueError(
-                f"Unsupported type '{key_type}'. "
-                "Supported types: bytearray, bytes, str"
-            )
+    def get_public_key(self) -> bytes:
+        """Get the private key as bytes."""
+        return self.public_key
 
-    def get_encrytpion_options(self):
+    def get_private_key_str(self) -> str:
+        """Get the private key as a string."""
+        if not self.private_key:
+            raise LockedError()
+        return self.private_key.hex()
+
+    def get_public_key_str(self) -> str:
+        """Get the private key as a string."""
+        return self.public_key.hex()
+
+    def get_encrytpion_options(self) -> list[str]:
         """Get the encryption options supported by this cryptographic family.
-        Parameters:
+
+        Args:
             family (str): the name of the cryptographic famliy to query
         Returns:
             list: a list of strings, the supported encryption options
         """
         return get_encrytpion_options(self.family)
 
-    def get_signature_options(self):
+    def get_signature_options(self) -> list[str]:
         """Get the signature options supported by this cryptographic family.
-        Parameters:
+
+        Args:
             family (str): the name of the cryptographic famliy to query
         Returns:
             list: a list of strings, the supported signature options
@@ -256,10 +266,10 @@ class Crypt:
 
 
 class LockedError(Exception):
-    """Error when user tries to perform private-key operations with a locked
-    Encryptor object."""
+    """When private-key operations are attempted with a locked object."""
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """Print this Exception's message."""
         return (
             "This Crypt is locked. "
             "Unlock with Encryptor.unlock() in order to decrypt and sign data."
@@ -267,12 +277,14 @@ class LockedError(Exception):
 
 
 class KeyMismatchError(Exception):
-    """Error when user supplies non-corresponding public and private keys."""
+    """When non-corresponding public and private keys are supplied."""
+
     def_message = "This supplied private and public keys don't match."
 
     def __init__(self, message=def_message):
         super().__init__()
         self.message = message
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """Print this Exception's message."""
         return self.message

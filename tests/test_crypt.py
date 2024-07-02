@@ -43,7 +43,7 @@ crypt: Crypt
 def test_create_crypt(family, ):
     global crypt
     start_time = datetime.utcnow()
-    crypt = Crypt.new(family, )
+    crypt = Crypt.new(family)
 
     reconstructed_crypt = Crypt(family, crypt.private_key)
     duration = (datetime.utcnow() - start_time)

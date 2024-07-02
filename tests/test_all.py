@@ -1,11 +1,12 @@
 import os
 import importlib
+import importlib.util
 import sys
 
 
 def load_module_from_path(path: str):
     """Load a python module from a file or a folder.
-    Parameters:
+    Args:
         path (str): the path of the module file or folder
     Returns:
         module: the imported module

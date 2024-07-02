@@ -30,96 +30,96 @@ DEFAULT_SIGNATURE_OPTION = ""
 
 def generate_keys(keylength: int = DEFAULT_KEY_LENGTH):
     """Generate a pair of public and private keys.
-    Parameters:
+    Args:
         keylength (int): the number of bits the key is composed of
     Returns:
-        tuple: tuple of bytearrays, a public key and a private key
+        tuple: tuple of bytess, a public key and a private key
     """
-    private_key: bytearray
-    public_key: bytearray
+    private_key: bytes
+    public_key: bytes
     return (public_key, private_key)
 
 
 def derive_public_key(
-    private_key: bytearray
+    private_key: bytes
 ):
     """Given a private key, generate the corresponding public key.
-    Parameters:
-        private_key (bytearray): the private key
+    Args:
+        private_key (bytes): the private key
     Returns:
-        bytearray: the public key
+        bytes: the public key
     """
-    public_key: bytearray
+    public_key: bytes
     return public_key
 
 
 def encrypt(
-    data_to_encrypt: bytearray,
-    public_key: bytearray,
+    data_to_encrypt: bytes,
+    public_key: bytes,
     encryption_options: str = DEFAULT_ENCRYPTION_OPTION
 ):
     """Encrypt the provided data using the specified public key.
-    Parameters:
-        data_to_encrypt (bytearray): the data to encrypt
-        public_key (bytearray): the public key to be used for the encryption
+    Args:
+        data_to_encrypt (bytes): the data to encrypt
+        public_key (bytes): the public key to be used for the encryption
         encryption_options (str): specification code for which
                                 encryption/decryption protocol should be used
     Returns:
-        bytearray: the encrypted data
+        bytes: the encrypted data
     """
-    cipher: bytearray
+    cipher: bytes
     return cipher
 
 
 def decrypt(
-    data_to_decrypt: bytearray,
-    private_key: bytearray,
+    data_to_decrypt: bytes,
+    private_key: bytes,
     encryption_options: str = DEFAULT_ENCRYPTION_OPTION
 ):
     """Decrypt the provided data using the specified private key.
-    Parameters:
-        data_to_decrypt (bytearray): the data to decrypt
-        private_key (bytearray): the private key to be used for the decryption
+    Args:
+        data_to_decrypt (bytes): the data to decrypt
+        private_key (bytes): the private key to be used for the decryption
         encryption_options (str): specification code for which
                                 encryption/decryption protocol should be used
     Returns:
-        bytearray: the encrypted data
+        bytes: the encrypted data
     """
-    plaintext: bytearray
+    plaintext: bytes
     return plaintext
 
 
 def sign(
-    data: bytearray,
-    private_key: bytearray,
+    data: bytes,
+    private_key: bytes,
     signature_options: str = DEFAULT_SIGNATURE_OPTION
 ):
     """Sign the provided data using the specified private key.
-    Parameters:
-        data (bytearray): the data to sign
-        private_key (bytearray): the private key to be used for the signing
+    Args:
+        data (bytes): the data to sign
+        private_key (bytes): the private key to be used for the signing
         signature_options (str): specification code for which
                                 signature/verification protocol should be used
     Returns:
-        bytearray: the signature
+        bytes: the signature
     """
-    signature: bytearray
+    signature: bytes
     return signature
 
 
 def verify_signature(
     family: str,
-    signature: bytearray,
-    data: bytearray,
-    public_key: bytearray,
+    signature: bytes,
+    data: bytes,
+    public_key: bytes,
     signature_options: str = DEFAULT_SIGNATURE_OPTION
 ):
     """Verify the provided signature of the provided data using the specified
     private key.
-    Parameters:
-        signature (bytearray): the signaure to verify
-        data (bytearray): the data to sign
-        public_key (bytearray): the public key to verify the signature against
+    Args:
+        signature (bytes): the signaure to verify
+        data (bytes): the data to sign
+        public_key (bytes): the public key to verify the signature against
         signature_options (str): specification code for which
                                 signature/verification protocol should be used
     Returns:

@@ -47,11 +47,11 @@ crypt: Crypt
 encryptor: Crypt
 
 
-def test_create_encryptor(family, ):
+def test_create_encryptor(family):
     global crypt
     global encryptor
 
-    crypt = Crypt.new(family, )
+    crypt = Crypt.new(family)
 
     start_time = datetime.utcnow()
     encryptor = Crypt(family, public_key=crypt.public_key)

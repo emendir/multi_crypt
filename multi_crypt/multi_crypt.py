@@ -18,45 +18,45 @@ for loader, module_name, is_pkg in walk_packages(path=algorithms.__path__):
 def generate_keys(family: str, **kwargs):
     """Generate a pair of public and private keys to be used with the specified
     family.
-    Parameters:
+    Args:
         family (str): the cryptographic family of the keys
         keylength (int): the number of bits the key is composed of
     Returns:
-        tuple: tuple of bytearrays, a public key and a private key
+        tuple: tuple of bytess, a public key and a private key
     """
     return crypto_modules[family].generate_keys(**kwargs)
 
 
 def derive_public_key(
     family: str,
-    private_key: bytearray
-) -> bytearray:
+    private_key: bytes
+) -> bytes:
     """Given a private key, generate the corresponding public key.
-    Parameters:
+    Args:
         family (str): the cryptographic family of the keys
-        private_key (bytearray): the private key
+        private_key (bytes): the private key
     Returns:
-        bytearray: the public key
+        bytes: the public key
     """
     return crypto_modules[family].derive_public_key(private_key)
 
 
 def encrypt(
     family: str,
-    data_to_encrypt: bytearray,
-    public_key: bytearray,
+    data_to_encrypt: bytes,
+    public_key: bytes,
     encryption_options: str | None = None
 ):
     """Encrypt the provided data using the specified public key and encryption
     family.
-    Parameters:
+    Args:
         family (str): the cryptographic family to be used for the encryption
-        data_to_encrypt (bytearray): the data to encrypt
-        public_key (bytearray): the public key to be used for the encryption
+        data_to_encrypt (bytes): the data to encrypt
+        public_key (bytes): the public key to be used for the encryption
         encryption_options (str): specification code for which
                                 encryption/decryption protocol should be used
     Returns:
-        bytearray: the encrypted data
+        bytes: the encrypted data
     """
     return crypto_modules[family].encrypt(
         data_to_encrypt,
@@ -67,20 +67,20 @@ def encrypt(
 
 def decrypt(
     family: str,
-    data_to_decrypt: bytearray,
-    private_key: bytearray,
+    data_to_decrypt: bytes,
+    private_key: bytes,
     encryption_options: str | None = None
 ):
     """Decrypt the provided data using the specified private key and encryption
     family.
-    Parameters:
+    Args:
         family (str): the cryptographic family to be used for the decryption
-        data_to_decrypt (bytearray): the data to decrypt
-        private_key (bytearray): the private key to be used for the decryption
+        data_to_decrypt (bytes): the data to decrypt
+        private_key (bytes): the private key to be used for the decryption
         encryption_options (str): specification code for which
                                 encryption/decryption protocol should be used
     Returns:
-        bytearray: the encrypted data
+        bytes: the encrypted data
     """
     return crypto_modules[family].decrypt(
         data_to_decrypt,
@@ -91,38 +91,39 @@ def decrypt(
 
 def sign(
     family: str,
-    data: bytearray,
-    private_key: bytearray,
+    data: bytes,
+    private_key: bytes,
     signature_options: str | None = None
-):
+) -> bytes:
     """Sign the provided data using the specified private key and family.
-    Parameters:
+
+    Args:
         family (str): the cryptographic family to be used for the signing
-        data (bytearray): the data to sign
-        private_key (bytearray): the private key to be used for the signing
+        data (bytes): the data to sign
+        private_key (bytes): the private key to be used for the signing
         signature_options (str): specification code for which
                                 signature/verification protocol should be used
     Returns:
-        bytearray: the signature
+        bytes: the signature
     """
     return crypto_modules[family].sign(data, private_key, signature_options)
 
 
 def verify_signature(
     family: str,
-    signature: bytearray,
-    data: bytearray,
-    public_key: bytearray,
+    signature: bytes,
+    data: bytes,
+    public_key: bytes,
     signature_options: str | None = None
-):
-    """Verify the provided signature of the provided data using the specified
-    private key and family.
-    Parameters:
+) -> bool:
+    """Verify the given signature of the given data using the given key.
+
+    Args:
         family (str): the cryptographic family to be used for the signature
                     verification
-        signature (bytearray): the signaure to verify
-        data (bytearray): the data to sign
-        public_key (bytearray): the public key to verify the signature against
+        signature (bytes): the signaure to verify
+        data (bytes): the data to sign
+        public_key (bytes): the public key to verify the signature against
         signature_options (str): specification code for which
                                 signature/verification protocol should be used
     Returns:
@@ -162,9 +163,9 @@ def get_encryption_families():
     ]
 
 
-def get_encrytpion_options(family):
+def get_encrytpion_options(family: str) -> list[str]:
     """Get the encryption options supported by this cryptographic family.
-    Parameters:
+    Args:
         family (str): the name of the cryptographic famliy to query
     Returns:
         list: a list of strings, the supported encryption options
@@ -188,7 +189,7 @@ def get_signature_families():
 
 def get_signature_options(family):
     """Get the signature options supported by this cryptographic family.
-    Parameters:
+    Args:
         family (str): the name of the cryptographic famliy to query
     Returns:
         list: a list of strings, the supported signature options

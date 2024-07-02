@@ -20,86 +20,85 @@ DEFAULT_ENCRYPTION_OPTION = "AES_256_GCM"
 DEFAULT_SIGNATURE_OPTION = "SHA256"
 
 
-def generate_keys(keylength: int = DEFAULT_KEY_LENGTH):
+def generate_keys(keylength: int = DEFAULT_KEY_LENGTH) -> tuple[bytes, bytes]:
     """Generate a pair of public and private keys.
-    Parameters:
+    Args:
         keylength (int): the number of bits the key is composed of
     Returns:
-        tuple: tuple of bytearrays, a public key and a private key
+        tuple: tuple of bytess, a public key and a private key
     """
     if not keylength:
         keylength = DEFAULT_KEY_LENGTH
     key = generate_key()
 
-    public_key = bytearray(key.public_key.format(False))
-    private_key = bytearray(key.secret)
+    public_key = key.public_key.format(False)
+    private_key = key.secret
 
     return (public_key, private_key)
 
 
-def derive_public_key(private_key: bytearray):
+def derive_public_key(private_key: bytes) -> bytes:
     """Given a private key, generate the corresponding public key.
-    Parameters:
-        private_key (bytearray): the private key
+    Args:
+        private_key (bytes): the private key
     Returns:
-        bytearray: the public key
+        bytes: the public key
     """
     key = coincurve.PrivateKey.from_hex(private_key.hex())
     return key.public_key.format(False)
 
 
-def encrypt(data_to_encrypt: bytearray, public_key, encryption_options=""):
+def encrypt(data_to_encrypt: bytes, public_key, encryption_options: str = "") -> bytes:
     """Encrypt the provided data using the specified public key.
-    Parameters:
-        data_to_encrypt (bytearray): the data to encrypt
-        public_key (bytearray): the public key to be used for the encryption
+    Args:
+        data_to_encrypt (bytes): the data to encrypt
+        public_key (bytes): the public key to be used for the encryption
         encryption_options (str): specification code for which
                                 encryption/decryption protocol should be used
     Returns:
-        bytearray: the encrypted data
+        bytes: the encrypted data
     """
     if not encryption_options:
         encryption_options = DEFAULT_ENCRYPTION_OPTION
 
     if encryption_options == "AES_256_GCM":
-        return bytearray(
-            ecies.encrypt(public_key.hex(), bytes(data_to_encrypt))
-        )
+        return ecies.encrypt(public_key.hex(), data_to_encrypt)
+
     raise EncryptionOptionError(encryption_options)
 
 
 def decrypt(
-    encrypted_data: bytearray,
-    private_key: bytearray,
+    encrypted_data: bytes,
+    private_key: bytes,
     encryption_options=""
 ):
     """Decrypt the provided data using the specified private key.
-    Parameters:
-        data_to_decrypt (bytearray): the data to decrypt
-        private_key (bytearray): the private key to be used for the decryption
+    Args:
+        data_to_decrypt (bytes): the data to decrypt
+        private_key (bytes): the private key to be used for the decryption
         encryption_options (str): specification code for which
                                 encryption/decryption protocol should be used
     Returns:
-        bytearray: the encrypted data
+        bytes: the encrypted data
     """
     if not encryption_options:
         encryption_options = DEFAULT_ENCRYPTION_OPTION
 
     if encryption_options == "AES_256_GCM":
-        return ecies.decrypt(private_key.hex(),  bytes(encrypted_data))
+        return ecies.decrypt(private_key.hex(),  encrypted_data)
 
     raise EncryptionOptionError(encryption_options)
 
 
-def sign(data: bytes, private_key: bytearray, signature_options=""):
+def sign(data: bytes, private_key: bytes, signature_options=""):
     """Sign the provided data using the specified private key.
-    Parameters:
-        data (bytearray): the data to sign
-        private_key (bytearray): the private key to be used for the signing
+    Args:
+        data (bytes): the data to sign
+        private_key (bytes): the private key to be used for the signing
         signature_options (str): specification code for which
                                 signature/verification protocol should be used
     Returns:
-        bytearray: the signature
+        bytes: the signature
     """
     key = coincurve.PrivateKey.from_hex(private_key.hex())
 
@@ -120,10 +119,10 @@ def verify_signature(
 ):
     """Verify the provided signature of the provided data using the specified
     private key.
-    Parameters:
-        signature (bytearray): the signaure to verify
-        data (bytearray): the data to sign
-        public_key (bytearray): the public key to verify the signature against
+    Args:
+        signature (bytes): the signaure to verify
+        data (bytes): the data to sign
+        public_key (bytes): the public key to verify the signature against
         signature_options (str): specification code for which
                                 signature/verification protocol should be used
     Returns:
@@ -134,9 +133,9 @@ def verify_signature(
 
     if signature_options == "SHA256":
         return coincurve.verify_signature(
-            bytes(signature),
-            bytes(data),
-            bytes(public_key),
+            signature,
+            data,
+            public_key,
             hasher=coincurve.utils.sha256
         )
     raise SignatureOptionError(signature_options)
