@@ -80,7 +80,7 @@ def decrypt(
         encryption_options (str): specification code for which
                                 encryption/decryption protocol should be used
     Returns:
-        bytes: the encrypted data
+        bytes: the decrypted data
     """
     return crypto_modules[family].decrypt(
         data_to_decrypt,

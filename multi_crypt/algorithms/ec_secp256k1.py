@@ -79,7 +79,7 @@ def decrypt(
         encryption_options (str): specification code for which
                                 encryption/decryption protocol should be used
     Returns:
-        bytes: the encrypted data
+        bytes: the decrypted data
     """
     if not encryption_options:
         encryption_options = DEFAULT_ENCRYPTION_OPTION

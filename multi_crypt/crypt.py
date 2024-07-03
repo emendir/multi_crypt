@@ -168,7 +168,7 @@ class Crypt:
             encryption_options (str): specification code for which
                                     encryption/decryption protocol should be used
         Returns:
-            bytes: the encrypted data
+            bytes: the decrypted data
         """
         if not self.private_key:
             raise LockedError()
