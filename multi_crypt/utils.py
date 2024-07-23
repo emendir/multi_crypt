@@ -1,7 +1,6 @@
 """Various helper functions"""
 from pkgutil import walk_packages
 from importlib import import_module
-from . import algorithms
 import pkgutil
 import os
 import sys
