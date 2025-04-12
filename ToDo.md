@@ -1,3 +1,4 @@
 - in encryption_options and signature_options, replace `None` with `""`
 - Crypt.from_private_key function
 - When constructing Crypt given public and private key, find more efficient way of verifying them than public key derivation
+- docs & examples
