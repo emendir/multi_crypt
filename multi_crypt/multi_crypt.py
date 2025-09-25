@@ -6,20 +6,20 @@ in ./algorithms.
 from pkgutil import walk_packages
 from importlib import import_module
 from . import algorithms
+from .algorithms import rsa, ec_secp256k1
 
-crypto_modules = dict()
 
-if True:
-    from .algorithms import rsa, ec_secp256k1
-crypto_modules.update({"EC-secp256k1": ec_secp256k1, "RSA": rsa})
+crypto_modules = {"EC-secp256k1": ec_secp256k1, "RSA": rsa}
 
-# load all cryptographic family modules from the algorithms folder
-for loader, module_name, is_pkg in walk_packages(path=algorithms.__path__):
-    module = import_module(f"{algorithms.__name__}.{module_name}")
-    if module.FAMILY_NAME in crypto_modules:
-        continue
-    crypto_modules.update({module.FAMILY_NAME: module})
-    print(module.FAMILY_NAME)
+# A SHAME TO DISABLE THE FOLLOWING,
+# 'twas such a neat pythonic zero-boilerplate solution!
+# # load all cryptographic family modules from the algorithms folder
+# for loader, module_name, is_pkg in walk_packages(path=algorithms.__path__):
+#     module = import_module(f"{algorithms.__name__}.{module_name}")
+#     if module.FAMILY_NAME in crypto_modules:
+#         continue
+#     crypto_modules.update({module.FAMILY_NAME: module})
+#     print(module.FAMILY_NAME)
 
 
 def generate_keys(family: str, **kwargs):

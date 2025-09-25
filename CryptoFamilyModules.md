@@ -2,10 +2,16 @@ In this library, a family of cryptographic algorithms is a collection of differe
 
 ## Functions:
 
-Each module must provide the following functions and a string `FAMILY_NAME`:
 
 _Use the code from ./crypto_family_template.py to get started on building your own module, it contains a few more useful details than this here._
+Then, in `multi_crypt.py`, import the module and add it to the `crypto_modules` dictionary:
+```python
+from .algorithms import rsa, ec_secp256k1
 
+crypto_modules = {"EC-secp256k1": ec_secp256k1, "RSA": rsa}
+```
+
+Each module must provide the following functions and a string `FAMILY_NAME`:
 ```python
 FAMILY_NAME = ""
 
