@@ -9,10 +9,17 @@ from . import algorithms
 
 crypto_modules = dict()
 
+if True:
+    from .algorithms import rsa, ec_secp256k1
+crypto_modules.update({"EC-secp256k1": ec_secp256k1, "RSA": rsa})
+
 # load all cryptographic family modules from the algorithms folder
 for loader, module_name, is_pkg in walk_packages(path=algorithms.__path__):
     module = import_module(f"{algorithms.__name__}.{module_name}")
+    if module.FAMILY_NAME in crypto_modules:
+        continue
     crypto_modules.update({module.FAMILY_NAME: module})
+    print(module.FAMILY_NAME)
 
 
 def generate_keys(family: str, **kwargs):
@@ -27,10 +34,7 @@ def generate_keys(family: str, **kwargs):
     return crypto_modules[family].generate_keys(**kwargs)
 
 
-def derive_public_key(
-    family: str,
-    private_key: bytes
-) -> bytes:
+def derive_public_key(family: str, private_key: bytes) -> bytes:
     """Given a private key, generate the corresponding public key.
     Args:
         family (str): the cryptographic family of the keys
@@ -45,7 +49,7 @@ def encrypt(
     family: str,
     data_to_encrypt: bytes,
     public_key: bytes,
-    encryption_options: str | None = None
+    encryption_options: str | None = None,
 ):
     """Encrypt the provided data using the specified public key and encryption
     family.
@@ -59,9 +63,7 @@ def encrypt(
         bytes: the encrypted data
     """
     return crypto_modules[family].encrypt(
-        data_to_encrypt,
-        public_key,
-        encryption_options
+        data_to_encrypt, public_key, encryption_options
     )
 
 
@@ -69,7 +71,7 @@ def decrypt(
     family: str,
     data_to_decrypt: bytes,
     private_key: bytes,
-    encryption_options: str | None = None
+    encryption_options: str | None = None,
 ):
     """Decrypt the provided data using the specified private key and encryption
     family.
@@ -83,9 +85,7 @@ def decrypt(
         bytes: the decrypted data
     """
     return crypto_modules[family].decrypt(
-        data_to_decrypt,
-        private_key,
-        encryption_options
+        data_to_decrypt, private_key, encryption_options
     )
 
 
@@ -93,7 +93,7 @@ def sign(
     family: str,
     data: bytes,
     private_key: bytes,
-    signature_options: str | None = None
+    signature_options: str | None = None,
 ) -> bytes:
     """Sign the provided data using the specified private key and family.
 
@@ -114,7 +114,7 @@ def verify_signature(
     signature: bytes,
     data: bytes,
     public_key: bytes,
-    signature_options: str | None = None
+    signature_options: str | None = None,
 ) -> bool:
     """Verify the given signature of the given data using the given key.
 
@@ -130,10 +130,7 @@ def verify_signature(
         bool: whether or not the signature matches the data
     """
     return crypto_modules[family].verify_signature(
-        signature,
-        data,
-        public_key,
-        signature_options
+        signature, data, public_key, signature_options
     )
 
 
@@ -144,9 +141,7 @@ def get_all_families():
         list: a list of strings, the names of the supported cryptographic
                 families
     """
-    return [
-        name for name, mod in list(crypto_modules.items())
-    ]
+    return [name for name, mod in list(crypto_modules.items())]
 
 
 def get_encryption_families():
@@ -158,7 +153,8 @@ def get_encryption_families():
                 families
     """
     return [
-        name for name, mod in list(crypto_modules.items())
+        name
+        for name, mod in list(crypto_modules.items())
         if hasattr(mod, "encrypt") and hasattr(mod, "decrypt")
     ]
 
@@ -182,7 +178,8 @@ def get_signature_families():
                 families
     """
     return [
-        name for name, mod in list(crypto_modules.items())
+        name
+        for name, mod in list(crypto_modules.items())
         if hasattr(mod, "sign") and hasattr(mod, "verify_signature")
     ]
 
