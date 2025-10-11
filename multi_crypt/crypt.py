@@ -18,7 +18,7 @@ from .multi_crypt import (  # pylint:disable=unused-import
 )
 from .utils import to_bytes
 
-_Crypt = TypeVar('_Crypt', bound='Crypt')
+_Crypt = TypeVar("_Crypt", bound="Crypt")
 
 
 class Crypt:
@@ -38,7 +38,7 @@ class Crypt:
         self,
         family: str,
         private_key: bytes | None = None,
-        public_key: bytes | None = None
+        public_key: bytes | None = None,
     ):
         """Create a Crypt object for an existing set of cryptographic keys.
 
@@ -114,7 +114,7 @@ class Crypt:
         """Load a Crypt object from serialised data."""
         return cls(
             family=data["family"],
-            private_key=data["private_key"],
+            private_key=data.get("private_key"),
             public_key=data["public_key"],
         )
 
@@ -129,16 +129,16 @@ class Crypt:
         private_key = to_bytes(private_key, "private_key")
 
         if derive_public_key(self.family, private_key) != self.public_key:
-            raise KeyMismatchError((
-                "Wrong private key! The given private key does not match this "
-                "encryptor's public key."
-            ))
+            raise KeyMismatchError(
+                (
+                    "Wrong private key! The given private key does not match this "
+                    "encryptor's public key."
+                )
+            )
         self.private_key = private_key
 
     def encrypt(
-        self,
-        data_to_encrypt: bytes,
-        encryption_options: str | None = None
+        self, data_to_encrypt: bytes, encryption_options: str | None = None
     ) -> bytes:
         """Encrypt the provided data using the specified public key.
 
@@ -153,13 +153,11 @@ class Crypt:
             self.family,
             data_to_encrypt,
             self.public_key,
-            encryption_options=encryption_options
+            encryption_options=encryption_options,
         )
 
     def decrypt(
-        self,
-        encrypted_data: bytes,
-        encryption_options: str | None = None
+        self, encrypted_data: bytes, encryption_options: str | None = None
     ) -> bytes:
         """Decrypt the provided data using the specified private key.
 
@@ -176,7 +174,7 @@ class Crypt:
             self.family,
             encrypted_data,
             self.private_key,
-            encryption_options=encryption_options
+            encryption_options=encryption_options,
         )
 
     def sign(self, data: bytes, signature_options: str | None = None) -> bytes:
@@ -196,14 +194,14 @@ class Crypt:
             self.family,
             to_bytes(data, "data"),
             self.private_key,
-            signature_options=signature_options
+            signature_options=signature_options,
         )
 
     def verify_signature(
         self,
         signature: bytes,
         data: bytes,
-        signature_options: str | None = None
+        signature_options: str | None = None,
     ) -> bool:
         """Verify the given signature of the given data using the given key.
 
@@ -221,7 +219,7 @@ class Crypt:
             to_bytes(signature, "signature"),
             to_bytes(data, "data"),
             self.public_key,
-            signature_options=signature_options
+            signature_options=signature_options,
         )
 
     def get_private_key(self) -> bytes:
