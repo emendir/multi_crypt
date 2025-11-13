@@ -27,17 +27,18 @@ def generate_keys(keylength: int = None):
     return (public_key, private_key)
 
 
-def derive_public_key(
-    private_key: bytes
-):
-    """Given a private key, generate the corresponding public key.
+def check_key_pair(
+    private_key: bytes,
+    public_key: bytes
+) -> bool:
+    """Check if a private key and public key form a valid keypair.
     Args:
         private_key (bytes): the private key
+        public_key (bytes): the public key
     Returns:
-        bytes: the public key
+        bool: True if the keys form a valid pair, False otherwise
     """
-    public_key: bytes
-    return public_key
+    return True  # or False
 
 
 def encrypt(

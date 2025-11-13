@@ -7,8 +7,8 @@ Crypt implements all the functionality of multi_crypt.
 from typing import Type, TypeVar
 
 from .multi_crypt import (  # pylint:disable=unused-import
+    check_key_pair,
     decrypt,
-    derive_public_key,
     encrypt,
     generate_keys,
     get_encrytpion_options,
@@ -50,29 +50,38 @@ class Crypt:
         Args:
             family (str): the cryptographic family of the keys
             private_key (bytes): the private key. Required for the ability
-                                    to decrypt and sign data
-            public_key (bytes): the public key. Not required if private_key
-                                    is supplied
+                                    to decrypt and sign data. If supplied,
+                                    public_key must also be supplied.
+            public_key (bytes): the public key. Required.
         Returns:
             Crypt: Crypt object for performing cryptographic operations
         """
         self.family = family
+
+        # Type check and convert inputs
         if private_key:
-            # type checking private key
-            self.private_key = to_bytes(private_key, "private_key")
-            self.public_key = derive_public_key(self.family, self.private_key)
+            private_key = to_bytes(private_key, "private_key")
+        if public_key:
+            public_key = to_bytes(public_key, "public_key")
+
+        # Validate key combination
+        if not public_key:
+            raise ValueError(
+                "public_key must be supplied. "
+                "Note: derive_public_key is no longer supported."
+            )
+
+        if private_key:
+            # Verify the key pair matches
+            if not check_key_pair(family, private_key, public_key):
+                raise KeyMismatchError(
+                    "The supplied private and public keys don't form a valid keypair."
+                )
+            self.private_key = private_key
         else:
             self.private_key = None
-        if public_key:
-            public_key = to_bytes(public_key, "private_key")
-            if private_key:
-                if not self.public_key == public_key:
-                    raise KeyMismatchError()
-            self.public_key = public_key
-        elif not private_key:
-            raise ValueError(
-                "Either private_key or public_key must be supplied."
-            )
+
+        self.public_key = public_key
 
     @classmethod
     def new(
@@ -86,11 +95,10 @@ class Crypt:
         Returns:
             Crypt: Crypt object for performing cryptographic operations
         """
-        # pylint: disable=unused-variable
         public_key, private_key = generate_keys(
             family=family, keylength=keylength
         )
-        return cls(family, private_key)
+        return cls(family, private_key, public_key)
 
     def serialise_private(self) -> dict:
         """Serialise all this crypt's information including its private key."""
@@ -128,7 +136,7 @@ class Crypt:
         # type checking private key
         private_key = to_bytes(private_key, "private_key")
 
-        if derive_public_key(self.family, private_key) != self.public_key:
+        if not check_key_pair(self.family, private_key, self.public_key):
             raise KeyMismatchError(
                 (
                     "Wrong private key! The given private key does not match this "

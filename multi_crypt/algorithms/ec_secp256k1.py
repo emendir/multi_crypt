@@ -37,15 +37,20 @@ def generate_keys(keylength: int = DEFAULT_KEY_LENGTH) -> tuple[bytes, bytes]:
     return (public_key, private_key)
 
 
-def derive_public_key(private_key: bytes) -> bytes:
-    """Given a private key, generate the corresponding public key.
+def check_key_pair(private_key: bytes, public_key: bytes) -> bool:
+    """Check if a private key and public key form a valid keypair.
     Args:
         private_key (bytes): the private key
+        public_key (bytes): the public key
     Returns:
-        bytes: the public key
+        bool: True if the keys form a valid pair, False otherwise
     """
-    key = coincurve.PrivateKey.from_hex(private_key.hex())
-    return key.public_key.format(False)
+    try:
+        key = coincurve.PrivateKey.from_hex(private_key.hex())
+        derived_public = key.public_key.format(False)
+        return derived_public == public_key
+    except (ValueError, TypeError, AttributeError):
+        return False
 
 
 def encrypt(data_to_encrypt: bytes, public_key, encryption_options: str = "") -> bytes:

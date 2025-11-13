@@ -36,15 +36,23 @@ def generate_keys(keylength: int = DEFAULT_KEY_LENGTH):
     return (public_key, private_key)
 
 
-def derive_public_key(private_key: bytes):
-    """Given a private key, generate the corresponding public key.
+def check_key_pair(private_key: bytes, public_key: bytes) -> bool:
+    """Check if a private key and public key form a valid keypair.
     Args:
         private_key (bytes): the private key
+        public_key (bytes): the public key
     Returns:
-        bytes: the public key
+        bool: True if the keys form a valid pair, False otherwise
     """
-    private_key_obj = RSA.import_key(private_key)
-    return private_key_obj.publickey().export_key(format='DER')
+    try:
+        private_key_obj = RSA.import_key(private_key)
+        public_key_obj = RSA.import_key(public_key)
+
+        # Derive public key from private key and compare
+        derived_public = private_key_obj.publickey().export_key(format='DER')
+        return derived_public == public_key
+    except (ValueError, TypeError, IndexError, AttributeError):
+        return False
 
 
 def encrypt(

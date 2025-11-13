@@ -7,14 +7,14 @@ by bundling:
 
 Security Level: 3 (NIST Level 3 - recommended default)
 Key Sizes:
-  - Public: 3,136 bytes (1,184 + 1,952)
-  - Private: 9,568 bytes (2,400 + 4,032 + 3,136 public keys for derivation)
+  - Public: 3,136 bytes (KEM 1,184 + Sig 1,952)
+  - Private: 6,432 bytes (KEM 2,400 + Sig 4,032)
 """
 
 from .._libboqs import (
     PQFamilyConfig,
     generate_bundled_keys,
-    derive_public_from_private,
+    check_bundled_key_pair,
     encrypt_hybrid,
     decrypt_hybrid,
     sign_data,
@@ -64,21 +64,22 @@ def generate_keys(keylength: int = None, **kwargs) -> tuple[bytes, bytes]:
     Returns:
         tuple: (public_key_bundle, private_key_bundle) as bytes
             - public_key_bundle: 3,136 bytes (KEM public 1,184 + Sig public 1,952)
-            - private_key_bundle: 9,568 bytes (includes private + public keys)
+            - private_key_bundle: 6,432 bytes (KEM private 2,400 + Sig private 4,032)
     """
     return generate_bundled_keys(_CONFIG)
 
 
-def derive_public_key(private_key: bytes) -> bytes:
-    """Derive the public key from a private key.
+def check_key_pair(private_key: bytes, public_key: bytes) -> bool:
+    """Check if a private key and public key form a valid keypair.
 
     Args:
-        private_key: Private key bundle (9,568 bytes)
+        private_key: Private key bundle (6,432 bytes)
+        public_key: Public key bundle (3,136 bytes)
 
     Returns:
-        bytes: Public key bundle (3,136 bytes)
+        bool: True if the keys form a valid pair, False otherwise
     """
-    return derive_public_from_private(private_key, _CONFIG)
+    return check_bundled_key_pair(private_key, public_key, _CONFIG)
 
 
 def encrypt(

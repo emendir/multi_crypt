@@ -39,15 +39,16 @@ def generate_keys(family: str, **kwargs):
     return crypto_modules[family].generate_keys(**kwargs)
 
 
-def derive_public_key(family: str, private_key: bytes) -> bytes:
-    """Given a private key, generate the corresponding public key.
+def check_key_pair(family: str, private_key: bytes, public_key: bytes) -> bool:
+    """Check if a private key and public key form a valid keypair.
     Args:
         family (str): the cryptographic family of the keys
         private_key (bytes): the private key
+        public_key (bytes): the public key
     Returns:
-        bytes: the public key
+        bool: True if the keys form a valid pair, False otherwise
     """
-    return crypto_modules[family].derive_public_key(private_key)
+    return crypto_modules[family].check_key_pair(private_key, public_key)
 
 
 def encrypt(

@@ -70,8 +70,9 @@ def generate_bundled_keys(config: PQFamilyConfig) -> tuple[bytes, bytes]:
     Returns:
         tuple: (public_key_bundle, private_key_bundle) as bytes
 
-    Note: The private key bundle includes the public keys to enable derive_public_key.
-    Format: kem_private || sig_private || kem_public || sig_public
+    Format:
+        - public_bundle: kem_public || sig_public
+        - private_bundle: kem_private || sig_private
     """
     # Generate KEM keypair
     with oqs.KeyEncapsulation(config.kem_algorithm) as kem:
@@ -97,35 +98,71 @@ def generate_bundled_keys(config: PQFamilyConfig) -> tuple[bytes, bytes]:
     )
 
     # Bundle keys
-    # Public bundle: just the two public keys
     public_bundle = kem_public + sig_public
-    # Private bundle: private keys + public keys (for derivation)
-    # TODO: don't include public in private key!
-    private_bundle = kem_private + sig_private + kem_public + sig_public
+    private_bundle = kem_private + sig_private
 
     return (public_bundle, private_bundle)
 
 
-def derive_public_from_private(
-    private_bundle: bytes, config: PQFamilyConfig
-) -> bytes:
-    """Derive public key bundle from private key bundle.
+def check_bundled_key_pair(
+    private_bundle: bytes, public_bundle: bytes, config: PQFamilyConfig
+) -> bool:
+    """Check if a private key bundle and public key bundle form a valid keypair.
 
-    The private key bundle includes the public keys at the end for this purpose.
-    Format: kem_private || sig_private || kem_public || sig_public
+    Note: For post-quantum algorithms, we cannot derive public keys from private keys.
+    Instead, we verify the keypair by performing a test encryption/decryption cycle.
 
     Args:
-        private_bundle: Bundled private key bytes (includes public keys)
+        private_bundle: Bundled private key bytes (kem_private || sig_private)
+        public_bundle: Bundled public key bytes (kem_public || sig_public)
         config: Family configuration
 
     Returns:
-        bytes: Bundled public key
+        bool: True if the keys form a valid pair, False otherwise
     """
-    # Extract public keys from the end of the private bundle
-    public_start = config.kem_private_size + config.sig_private_size
-    public_bundle = private_bundle[public_start:]
+    try:
+        # Verify bundle sizes
+        if len(private_bundle) != config.private_bundle_size:
+            return False
+        if len(public_bundle) != config.public_bundle_size:
+            return False
 
-    return public_bundle
+        # Extract KEM keys
+        kem_public = public_bundle[0 : config.kem_public_size]
+        kem_private = private_bundle[0 : config.kem_private_size]
+
+        # Test KEM keypair by doing encapsulation/decapsulation
+        with oqs.KeyEncapsulation(config.kem_algorithm) as kem:
+            kem_ciphertext, shared_secret_1 = kem.encap_secret(kem_public)
+
+        with oqs.KeyEncapsulation(
+            config.kem_algorithm, secret_key=kem_private
+        ) as kem:
+            shared_secret_2 = kem.decap_secret(kem_ciphertext)
+
+        # If decapsulation produces the same shared secret, the KEM keypair is valid
+        if shared_secret_1 != shared_secret_2:
+            return False
+
+        # Extract signature keys
+        sig_public = public_bundle[config.kem_public_size :]
+        sig_private_start = config.kem_private_size
+        sig_private = private_bundle[
+            sig_private_start : sig_private_start + config.sig_private_size
+        ]
+
+        # Test signature keypair by signing and verifying test data
+        test_data = b"MultiCrypt key pair verification test"
+        with oqs.Signature(config.sig_algorithm, secret_key=sig_private) as signer:
+            signature = signer.sign(test_data)
+
+        with oqs.Signature(config.sig_algorithm) as verifier:
+            is_valid = verifier.verify(test_data, signature, sig_public)
+
+        return is_valid
+
+    except Exception:
+        return False
 
 
 def encrypt_hybrid(
@@ -299,10 +336,11 @@ def sign_data(
     Raises:
         SignatureOptionError: If signature_option is not supported
     """
-    # Extract signature private key from bundle (not including appended public keys)
+    # Extract signature private key from bundle
     sig_private_start = config.kem_private_size
-    sig_private_end = sig_private_start + config.sig_private_size
-    sig_private = private_bundle[sig_private_start:sig_private_end]
+    sig_private = private_bundle[
+        sig_private_start : sig_private_start + config.sig_private_size
+    ]
 
     # Apply prehashing if requested
     data_to_sign = data

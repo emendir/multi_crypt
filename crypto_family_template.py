@@ -40,17 +40,24 @@ def generate_keys(keylength: int = DEFAULT_KEY_LENGTH):
     return (public_key, private_key)
 
 
-def derive_public_key(
-    private_key: bytes
-):
-    """Given a private key, generate the corresponding public key.
+def check_key_pair(
+    private_key: bytes,
+    public_key: bytes
+) -> bool:
+    """Check if a private key and public key form a valid keypair.
     Args:
         private_key (bytes): the private key
+        public_key (bytes): the public key
     Returns:
-        bytes: the public key
+        bool: True if the keys form a valid pair, False otherwise
     """
-    public_key: bytes
-    return public_key
+    # Implementation depends on the cryptographic algorithm
+    # For algorithms that support deriving public from private:
+    #   derived_public = derive_from_private(private_key)
+    #   return derived_public == public_key
+    # For algorithms that don't support derivation (e.g., post-quantum):
+    #   Test the keypair with a sign/verify or encrypt/decrypt cycle
+    return True  # or False
 
 
 def encrypt(

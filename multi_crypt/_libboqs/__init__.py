@@ -9,7 +9,7 @@ families using the liboqs library. It handles key bundling, hybrid encryption
 from .pq_base import (
     PQFamilyConfig,
     generate_bundled_keys,
-    derive_public_from_private,
+    check_bundled_key_pair,
     encrypt_hybrid,
     decrypt_hybrid,
     sign_data,
@@ -19,7 +19,7 @@ from .pq_base import (
 __all__ = [
     'PQFamilyConfig',
     'generate_bundled_keys',
-    'derive_public_from_private',
+    'check_bundled_key_pair',
     'encrypt_hybrid',
     'decrypt_hybrid',
     'sign_data',

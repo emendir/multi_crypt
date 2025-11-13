@@ -10,7 +10,7 @@ if True:
 
     import multi_crypt
     from multi_crypt import (
-        generate_keys, derive_public_key,
+        generate_keys, check_key_pair,
         encrypt, decrypt,
         sign, verify_signature
     )
@@ -40,16 +40,16 @@ def mark(success, message, duration):
     return success
 
 
-def test_key_generation_derivation(family, ):
+def test_key_generation_check(family, ):
     start_time = datetime.utcnow()
     public_key, private_key = generate_keys(family, )
 
-    derived_pubkey = derive_public_key(family, private_key)
+    keypair_valid = check_key_pair(family, private_key, public_key)
     duration = (datetime.utcnow() - start_time)
 
     mark(
-        derived_pubkey == public_key,
-        f"{family}: Private Key Check",
+        keypair_valid,
+        f"{family}: Key Pair Check",
         duration
     )
 
@@ -99,7 +99,7 @@ def run_tests():
     print("Running tests for all algorithms:")
 
     for family in multi_crypt.get_all_families():
-        test_key_generation_derivation(family, )
+        test_key_generation_check(family, )
     for family in multi_crypt.get_encryption_families():
         test_encryption_decryption(family)
         for option in multi_crypt.get_encrytpion_options(family):
