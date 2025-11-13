@@ -8,7 +8,6 @@ Digital Signature Algorithms (DSA).
 
 import hashlib
 from dataclasses import dataclass
-from typing import Optional
 
 try:
     import oqs
@@ -20,7 +19,6 @@ except ImportError:
 
 try:
     from Crypto.Cipher import AES
-    from Crypto.Random import get_random_bytes
 except ImportError:
     raise ImportError(
         "pycryptodome is required for hybrid encryption. "
@@ -43,6 +41,7 @@ class PQFamilyConfig:
         sig_public_size: Size of signature public key in bytes
         sig_private_size: Size of signature private key in bytes
     """
+
     kem_algorithm: str
     sig_algorithm: str
     kem_public_size: int
@@ -84,18 +83,31 @@ def generate_bundled_keys(config: PQFamilyConfig) -> tuple[bytes, bytes]:
         sig_public = signer.generate_keypair()
         sig_private = signer.export_secret_key()
 
+    assert len(kem_public) == config.kem_public_size, (
+        "key generation: unexpected size for kem public key"
+    )
+    assert len(kem_private) == config.kem_private_size, (
+        "key generation: unexpected size for kem private key"
+    )
+    assert len(sig_public) == config.sig_public_size, (
+        "key generation: unexpected size for sig public key"
+    )
+    assert len(sig_private) == config.sig_private_size, (
+        "key generation: unexpected size for sig private key"
+    )
+
     # Bundle keys
     # Public bundle: just the two public keys
     public_bundle = kem_public + sig_public
     # Private bundle: private keys + public keys (for derivation)
+    # TODO: don't include public in private key!
     private_bundle = kem_private + sig_private + kem_public + sig_public
 
     return (public_bundle, private_bundle)
 
 
 def derive_public_from_private(
-    private_bundle: bytes,
-    config: PQFamilyConfig
+    private_bundle: bytes, config: PQFamilyConfig
 ) -> bytes:
     """Derive public key bundle from private key bundle.
 
@@ -120,7 +132,7 @@ def encrypt_hybrid(
     data: bytes,
     public_bundle: bytes,
     config: PQFamilyConfig,
-    encryption_option: str = "AES-256-GCM"
+    encryption_option: str = "AES-256-GCM",
 ) -> bytes:
     """Encrypt data using hybrid KEM/DEM encryption.
 
@@ -143,7 +155,7 @@ def encrypt_hybrid(
         EncryptionOptionError: If encryption_option is not supported
     """
     # Extract KEM public key from bundle
-    kem_public = public_bundle[0:config.kem_public_size]
+    kem_public = public_bundle[0 : config.kem_public_size]
 
     # Encapsulate to get shared secret
     with oqs.KeyEncapsulation(config.kem_algorithm) as kem:
@@ -171,6 +183,7 @@ def encrypt_hybrid(
         # Would require: from Crypto.Cipher import ChaCha20_Poly1305
         try:
             from Crypto.Cipher import ChaCha20_Poly1305
+
             key = shared_secret[:32]
             cipher = ChaCha20_Poly1305.new(key=key)
             ciphertext, tag = cipher.encrypt_and_digest(data)
@@ -188,7 +201,7 @@ def decrypt_hybrid(
     ciphertext: bytes,
     private_bundle: bytes,
     config: PQFamilyConfig,
-    encryption_option: str = "AES-256-GCM"
+    encryption_option: str = "AES-256-GCM",
 ) -> bytes:
     """Decrypt data using hybrid KEM/DEM decryption.
 
@@ -212,21 +225,23 @@ def decrypt_hybrid(
         ValueError: If decryption fails (wrong key, corrupted data, etc.)
     """
     # Extract KEM private key from bundle
-    kem_private = private_bundle[0:config.kem_private_size]
+    kem_private = private_bundle[0 : config.kem_private_size]
 
     # Parse ciphertext components
-    kem_ciphertext = ciphertext[0:config.kem_ciphertext_size]
+    kem_ciphertext = ciphertext[0 : config.kem_ciphertext_size]
 
     # Decapsulate to recover shared secret
-    with oqs.KeyEncapsulation(config.kem_algorithm, secret_key=kem_private) as kem:
+    with oqs.KeyEncapsulation(
+        config.kem_algorithm, secret_key=kem_private
+    ) as kem:
         shared_secret = kem.decap_secret(kem_ciphertext)
 
     # Decrypt data with shared secret
     if encryption_option == "AES-256-GCM":
         key = shared_secret[:32]
         nonce_start = config.kem_ciphertext_size
-        nonce = ciphertext[nonce_start:nonce_start + 16]
-        symmetric_ciphertext = ciphertext[nonce_start + 16:-16]
+        nonce = ciphertext[nonce_start : nonce_start + 16]
+        symmetric_ciphertext = ciphertext[nonce_start + 16 : -16]
         tag = ciphertext[-16:]
 
         cipher = AES.new(key, AES.MODE_GCM, nonce=nonce)
@@ -235,8 +250,8 @@ def decrypt_hybrid(
     elif encryption_option == "AES-128-GCM":
         key = shared_secret[:16]
         nonce_start = config.kem_ciphertext_size
-        nonce = ciphertext[nonce_start:nonce_start + 16]
-        symmetric_ciphertext = ciphertext[nonce_start + 16:-16]
+        nonce = ciphertext[nonce_start : nonce_start + 16]
+        symmetric_ciphertext = ciphertext[nonce_start + 16 : -16]
         tag = ciphertext[-16:]
 
         cipher = AES.new(key, AES.MODE_GCM, nonce=nonce)
@@ -245,10 +260,12 @@ def decrypt_hybrid(
     elif encryption_option == "ChaCha20-Poly1305":
         try:
             from Crypto.Cipher import ChaCha20_Poly1305
+
             key = shared_secret[:32]
             nonce_start = config.kem_ciphertext_size
-            nonce = ciphertext[nonce_start:nonce_start + 12]  # ChaCha20 uses 12-byte nonce
-            symmetric_ciphertext = ciphertext[nonce_start + 12:-16]
+            # ChaCha20 uses 12-byte nonce
+            nonce = ciphertext[nonce_start : nonce_start + 12]
+            symmetric_ciphertext = ciphertext[nonce_start + 12 : -16]
             tag = ciphertext[-16:]
 
             cipher = ChaCha20_Poly1305.new(key=key, nonce=nonce)
@@ -266,7 +283,7 @@ def sign_data(
     data: bytes,
     private_bundle: bytes,
     config: PQFamilyConfig,
-    signature_option: str = "direct"
+    signature_option: str = "direct",
 ) -> bytes:
     """Sign data using the signature private key from the bundle.
 
@@ -308,7 +325,7 @@ def verify_data_signature(
     data: bytes,
     public_bundle: bytes,
     config: PQFamilyConfig,
-    signature_option: str = "direct"
+    signature_option: str = "direct",
 ) -> bool:
     """Verify a signature using the signature public key from the bundle.
 
@@ -326,7 +343,7 @@ def verify_data_signature(
         SignatureOptionError: If signature_option is not supported
     """
     # Extract signature public key from bundle
-    sig_public = public_bundle[config.kem_public_size:]
+    sig_public = public_bundle[config.kem_public_size :]
 
     # Apply prehashing if requested (must match signing)
     data_to_verify = data
