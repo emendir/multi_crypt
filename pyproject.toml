@@ -9,12 +9,12 @@ readme = {file = "ReadMe.md", content-type = "text/markdown"}
 authors = [{ name = "emendir" }]
 license = "MIT-0 OR CC0-1.0"
 description = "A single unified interface for working with alternative cryptographic algorithms."
-version = "0.1.1"
+version = "0.1.2"
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["multi_crypt", "multi_crypt.algorithms"]
+include = ["multi_crypt", "multi_crypt.algorithms", "multi_crypt._libboqs"]
 namespaces = false
