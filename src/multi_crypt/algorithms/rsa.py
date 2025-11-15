@@ -1,4 +1,5 @@
 """Cryptographic applications library based on the RSA algorithm."""
+
 from Crypto.PublicKey import RSA
 from Crypto.Signature import pkcs1_15
 from Crypto.Cipher import PKCS1_OAEP
@@ -7,13 +8,8 @@ from ..errors import EncryptionOptionError, SignatureOptionError
 
 FAMILY_NAME = "RSA"
 
-ENCRYPTION_OPTIONS = [
-    "PKCS1_OAEP"
-]
-SIGNATURE_OPTIONS = [
-    "SHA256-PKCS1_15",
-    "SHA512-PKCS1_15"
-]
+ENCRYPTION_OPTIONS = ["PKCS1_OAEP"]
+SIGNATURE_OPTIONS = ["SHA256-PKCS1_15", "SHA512-PKCS1_15"]
 
 DEFAULT_KEY_LENGTH = 2048
 DEFAULT_ENCRYPTION_OPTION = "PKCS1_OAEP"
@@ -30,8 +26,8 @@ def generate_keys(keylength: int = DEFAULT_KEY_LENGTH):
     if not keylength:
         keylength = DEFAULT_KEY_LENGTH
     key = RSA.generate(keylength)
-    public_key = key.publickey().export_key(format='DER')
-    private_key = key.export_key(format='DER')
+    public_key = key.publickey().export_key(format="DER")
+    private_key = key.export_key(format="DER")
 
     return (public_key, private_key)
 
@@ -49,7 +45,7 @@ def verify_key_pair(private_key: bytes, public_key: bytes) -> bool:
         public_key_obj = RSA.import_key(public_key)
 
         # Derive public key from private key and compare
-        derived_public = private_key_obj.publickey().export_key(format='DER')
+        derived_public = private_key_obj.publickey().export_key(format="DER")
         return derived_public == public_key
     except (ValueError, TypeError, IndexError, AttributeError):
         return False
@@ -58,7 +54,7 @@ def verify_key_pair(private_key: bytes, public_key: bytes) -> bool:
 def encrypt(
     data_to_encrypt: bytes,
     public_key: bytes,
-    encryption_options=DEFAULT_ENCRYPTION_OPTION
+    encryption_options=DEFAULT_ENCRYPTION_OPTION,
 ):
     """Encrypt the provided data using the specified public key.
     Args:
@@ -82,7 +78,7 @@ def encrypt(
 def decrypt(
     data_to_decrypt: bytes,
     private_key: bytes,
-    encryption_options=DEFAULT_ENCRYPTION_OPTION
+    encryption_options=DEFAULT_ENCRYPTION_OPTION,
 ):
     """Decrypt the provided data using the specified private key.
     Args:
@@ -104,9 +100,7 @@ def decrypt(
 
 
 def sign(
-    data: bytes,
-    private_key: bytes,
-    signature_options=DEFAULT_SIGNATURE_OPTION
+    data: bytes, private_key: bytes, signature_options=DEFAULT_SIGNATURE_OPTION
 ):
     """Sign the provided data using the specified private key.
     Args:
@@ -133,10 +127,11 @@ def sign(
 
 
 def verify_signature(
-        signature: bytes,
-        data: bytes,
-        public_key: bytes,
-        signature_options=DEFAULT_SIGNATURE_OPTION):
+    signature: bytes,
+    data: bytes,
+    public_key: bytes,
+    signature_options=DEFAULT_SIGNATURE_OPTION,
+):
     """Verify the provided signature of the provided data using the specified
     private key.
     Args:

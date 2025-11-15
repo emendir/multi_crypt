@@ -13,9 +13,8 @@ def load_module_from_path(path: str):
     """
     module_name = os.path.basename(path).strip(".py")
     if os.path.isdir(path):
-        path = os.path.join(path, '__init__.py')
-    spec = importlib.util.spec_from_file_location(
-        module_name, path)
+        path = os.path.join(path, "__init__.py")
+    spec = importlib.util.spec_from_file_location(module_name, path)
     module = importlib.util.module_from_spec(spec)
     sys.modules[module_name] = module
     spec.loader.exec_module(module)
@@ -26,8 +25,9 @@ tests = []  # list of all test modules
 
 # load test modules into the list
 for filename in os.listdir("."):
-    if not (os.path.isfile(filename) and filename[-3:] == ".py") \
-            or filename == os.path.basename(__file__):
+    if not (
+        os.path.isfile(filename) and filename[-3:] == ".py"
+    ) or filename == os.path.basename(__file__):
         continue
 
     tests.append(load_module_from_path(filename))

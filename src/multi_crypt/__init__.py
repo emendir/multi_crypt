@@ -12,7 +12,7 @@ from .multi_crypt import (
     get_encryption_families,
     get_encrytpion_options,
     get_signature_families,
-    get_signature_options
+    get_signature_options,
 )
 from .crypt import (
     Crypt,

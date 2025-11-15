@@ -1,4 +1,5 @@
 """Various helper functions"""
+
 from pkgutil import walk_packages
 from importlib import import_module
 import pkgutil
@@ -25,10 +26,12 @@ def to_bytes(
         return bytes(data)
     if isinstance(data, str):
         return bytes.fromhex(data)
-    raise ValueError((
-        f"{variable_name} must be of type bytes, bytes, or str, not "
-        f"{type(data)}"
-    ))
+    raise ValueError(
+        (
+            f"{variable_name} must be of type bytes, bytes, or str, not "
+            f"{type(data)}"
+        )
+    )
 
 
 def load_module_from_path(path: str):
@@ -40,9 +43,8 @@ def load_module_from_path(path: str):
     """
     module_name = os.path.basename(path).strip(".py")
     if os.path.isdir(path):
-        path = os.path.join(path, '__init__.py')
-    spec = importlib.util.spec_from_file_location(
-        module_name, path)
+        path = os.path.join(path, "__init__.py")
+    spec = importlib.util.spec_from_file_location(module_name, path)
     module = importlib.util.module_from_spec(spec)
     sys.modules[module_name] = module
     spec.loader.exec_module(module)
@@ -65,8 +67,9 @@ def load_modules_from_package(package):
 
 def list_submodules(package_name):
     # Use pkgutil.walk_packages to get an iterator of submodule information
-    submodules = pkgutil.walk_packages(path=__import__(
-        package_name).__path__, prefix=package_name + '.')
+    submodules = pkgutil.walk_packages(
+        path=__import__(package_name).__path__, prefix=package_name + "."
+    )
 
     # Print the submodule names
     for loader, name, is_pkg in submodules:

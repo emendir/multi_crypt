@@ -153,7 +153,9 @@ def check_bundled_key_pair(
 
         # Test signature keypair by signing and verifying test data
         test_data = b"MultiCrypt key pair verification test"
-        with oqs.Signature(config.sig_algorithm, secret_key=sig_private) as signer:
+        with oqs.Signature(
+            config.sig_algorithm, secret_key=sig_private
+        ) as signer:
             signature = signer.sign(test_data)
 
         with oqs.Signature(config.sig_algorithm) as verifier:

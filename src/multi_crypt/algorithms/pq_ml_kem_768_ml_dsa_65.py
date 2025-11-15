@@ -83,9 +83,7 @@ def verify_key_pair(private_key: bytes, public_key: bytes) -> bool:
 
 
 def encrypt(
-    data_to_encrypt: bytes,
-    public_key: bytes,
-    encryption_options: str = None
+    data_to_encrypt: bytes, public_key: bytes, encryption_options: str = None
 ) -> bytes:
     """Encrypt data using hybrid KEM/DEM encryption.
 
@@ -103,13 +101,13 @@ def encrypt(
     if not encryption_options:
         encryption_options = DEFAULT_ENCRYPTION_OPTION
 
-    return encrypt_hybrid(data_to_encrypt, public_key, _CONFIG, encryption_options)
+    return encrypt_hybrid(
+        data_to_encrypt, public_key, _CONFIG, encryption_options
+    )
 
 
 def decrypt(
-    data_to_decrypt: bytes,
-    private_key: bytes,
-    encryption_options: str = None
+    data_to_decrypt: bytes, private_key: bytes, encryption_options: str = None
 ) -> bytes:
     """Decrypt data using hybrid KEM/DEM decryption.
 
@@ -128,13 +126,13 @@ def decrypt(
     if not encryption_options:
         encryption_options = DEFAULT_ENCRYPTION_OPTION
 
-    return decrypt_hybrid(data_to_decrypt, private_key, _CONFIG, encryption_options)
+    return decrypt_hybrid(
+        data_to_decrypt, private_key, _CONFIG, encryption_options
+    )
 
 
 def sign(
-    data: bytes,
-    private_key: bytes,
-    signature_options: str = None
+    data: bytes, private_key: bytes, signature_options: str = None
 ) -> bytes:
     """Sign data using ML-DSA-65.
 
@@ -159,7 +157,7 @@ def verify_signature(
     signature: bytes,
     data: bytes,
     public_key: bytes,
-    signature_options: str = None
+    signature_options: str = None,
 ) -> bool:
     """Verify a signature using ML-DSA-65.
 
@@ -178,7 +176,9 @@ def verify_signature(
     if not signature_options:
         signature_options = DEFAULT_SIGNATURE_OPTION
 
-    return verify_data_signature(signature, data, public_key, _CONFIG, signature_options)
+    return verify_data_signature(
+        signature, data, public_key, _CONFIG, signature_options
+    )
 
 
 def get_encrytpion_options() -> list:

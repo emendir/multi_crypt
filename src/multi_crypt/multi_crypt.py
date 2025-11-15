@@ -6,7 +6,12 @@ in ./algorithms.
 from pkgutil import walk_packages
 from importlib import import_module
 from . import algorithms
-from .algorithms import rsa, ec_secp256k1, pq_ml_kem_1024_ml_dsa_87, pq_ml_kem_768_ml_dsa_65
+from .algorithms import (
+    rsa,
+    ec_secp256k1,
+    pq_ml_kem_1024_ml_dsa_87,
+    pq_ml_kem_768_ml_dsa_65,
+)
 
 
 crypto_modules = {
@@ -39,7 +44,9 @@ def generate_keys(family: str, **kwargs):
     return crypto_modules[family].generate_keys(**kwargs)
 
 
-def verify_key_pair(family: str, private_key: bytes, public_key: bytes) -> bool:
+def verify_key_pair(
+    family: str, private_key: bytes, public_key: bytes
+) -> bool:
     """Check if a private key and public key form a valid keypair.
     Args:
         family (str): the cryptographic family of the keys

@@ -16,7 +16,9 @@ from emtest import (
 )
 from loguru import logger
 
-PRINT_ERRORS = True  # whether or not to print error messages after failed tests
+PRINT_ERRORS = (
+    True  # whether or not to print error messages after failed tests
+)
 
 WORKDIR = os.path.dirname(os.path.abspath(__file__))
 PROJ_DIR = os.path.dirname(WORKDIR)

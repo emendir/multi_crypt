@@ -1,6 +1,5 @@
 """Cryptographic applications library based on elliptic curve cryptography."""
 
-
 from ecies.utils import generate_key
 import ecies
 import coincurve
@@ -8,12 +7,8 @@ from ..errors import EncryptionOptionError, SignatureOptionError
 
 FAMILY_NAME = "EC-secp256k1"
 
-ENCRYPTION_OPTIONS = [
-    "AES_256_GCM"
-]
-SIGNATURE_OPTIONS = [
-    "SHA256"
-]
+ENCRYPTION_OPTIONS = ["AES_256_GCM"]
+SIGNATURE_OPTIONS = ["SHA256"]
 
 DEFAULT_KEY_LENGTH = 2048
 DEFAULT_ENCRYPTION_OPTION = "AES_256_GCM"
@@ -53,7 +48,9 @@ def verify_key_pair(private_key: bytes, public_key: bytes) -> bool:
         return False
 
 
-def encrypt(data_to_encrypt: bytes, public_key, encryption_options: str = "") -> bytes:
+def encrypt(
+    data_to_encrypt: bytes, public_key, encryption_options: str = ""
+) -> bytes:
     """Encrypt the provided data using the specified public key.
     Args:
         data_to_encrypt (bytes): the data to encrypt
@@ -72,11 +69,7 @@ def encrypt(data_to_encrypt: bytes, public_key, encryption_options: str = "") ->
     raise EncryptionOptionError(encryption_options)
 
 
-def decrypt(
-    encrypted_data: bytes,
-    private_key: bytes,
-    encryption_options=""
-):
+def decrypt(encrypted_data: bytes, private_key: bytes, encryption_options=""):
     """Decrypt the provided data using the specified private key.
     Args:
         data_to_decrypt (bytes): the data to decrypt
@@ -90,7 +83,7 @@ def decrypt(
         encryption_options = DEFAULT_ENCRYPTION_OPTION
 
     if encryption_options == "AES_256_GCM":
-        return ecies.decrypt(private_key.hex(),  encrypted_data)
+        return ecies.decrypt(private_key.hex(), encrypted_data)
 
     raise EncryptionOptionError(encryption_options)
 
@@ -117,10 +110,7 @@ def sign(data: bytes, private_key: bytes, signature_options=""):
 
 
 def verify_signature(
-    signature: bytes,
-    data: bytes,
-    public_key: bytes,
-    signature_options=""
+    signature: bytes, data: bytes, public_key: bytes, signature_options=""
 ):
     """Verify the provided signature of the provided data using the specified
     private key.
@@ -138,10 +128,7 @@ def verify_signature(
 
     if signature_options == "SHA256":
         return coincurve.verify_signature(
-            signature,
-            data,
-            public_key,
-            hasher=coincurve.utils.sha256
+            signature, data, public_key, hasher=coincurve.utils.sha256
         )
     raise SignatureOptionError(signature_options)
 
