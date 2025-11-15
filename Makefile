@@ -85,13 +85,13 @@ docs: ## Build/process documentation
 # # ----------------------------
 # # Release Helpers
 # # ----------------------------
-# .PHONY: dist upload
+.PHONY: dist publish
 #
 # dist: build ## List built distributions
 # 	ls -lh $(DIST_DIR)
 #
-# upload: build ## Upload package to PyPI (requires twine)
-# 	twine upload $(DIST_DIR)/*
+publish: build ## Upload package to PyPI (requires twine)
+	twine upload $(DIST_DIR)/* && git push github master
 
 # ----------------------------
 # Help
