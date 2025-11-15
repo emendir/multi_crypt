@@ -7,7 +7,6 @@ from pkgutil import walk_packages
 from importlib import import_module
 from . import algorithms
 from .algorithms import (
-    rsa,
     ec_secp256k1,
     pq_ml_kem_1024_ml_dsa_87,
     pq_ml_kem_768_ml_dsa_65,
@@ -16,7 +15,6 @@ from .algorithms import (
 
 crypto_modules = {
     "EC-secp256k1": ec_secp256k1,
-    "RSA": rsa,
     "PQ-ML-KEM-1024-ML-DSA-87": pq_ml_kem_1024_ml_dsa_87,
     "PQ-ML-KEM-768-ML-DSA-65": pq_ml_kem_768_ml_dsa_65,
 }
