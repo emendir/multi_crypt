@@ -173,35 +173,6 @@ def generate_keys():
     return (public_key, private_key)
 ```
 
-### Deriving Public Key from Private Key
-
-**Challenge:** liboqs does not provide an API to derive public keys from private keys.
-
-**Solution:** Since liboqs private key exports often already contain or can regenerate public keys, we use the private key to reconstruct the keypair and extract the public key:
-
-```python
-def derive_public_key(private_key_bundle):
-    """Extract public keys from private key bundle."""
-    # Split private bundle
-    kem_private = private_key_bundle[0:KEM_PRIVATE_SIZE]
-    sig_private = private_key_bundle[KEM_PRIVATE_SIZE:]
-
-    # Reconstruct KEM public key
-    with oqs.KeyEncapsulation("ML-KEM-768") as kem:
-        # Generate dummy keypair first (required to initialize)
-        kem.generate_keypair()
-        # Import private key (liboqs private keys contain public key data)
-        # Note: May need algorithm-specific extraction logic
-        kem_public = extract_kem_public_from_private(kem_private)
-
-    # Reconstruct signature public key
-    with oqs.Signature("ML-DSA-65") as signer:
-        signer.generate_keypair()
-        sig_public = extract_sig_public_from_private(sig_private)
-
-    # Bundle public keys
-    return kem_public + sig_public
-```
 
 **Note:** Implementation may require algorithm-specific logic or storing public key within private key bundle if liboqs doesn't support extraction. This needs verification during implementation.
 

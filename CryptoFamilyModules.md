@@ -27,7 +27,7 @@ def generate_keys(keylength: int = None):
     return (public_key, private_key)
 
 
-def check_key_pair(
+def verify_key_pair(
     private_key: bytes,
     public_key: bytes
 ) -> bool:

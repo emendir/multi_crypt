@@ -9,7 +9,7 @@ readme = {file = "ReadMe.md", content-type = "text/markdown"}
 authors = [{ name = "emendir" }]
 license = "MIT-0 OR CC0-1.0"
 description = "A single unified interface for working with alternative cryptographic algorithms."
-version = "0.0.4"
+version = "0.1.0"
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}

@@ -10,7 +10,7 @@ if True:
 
     import multi_crypt
     from multi_crypt import (
-        generate_keys, check_key_pair,
+        generate_keys, verify_key_pair,
         encrypt, decrypt,
         sign, verify_signature
     )
@@ -44,7 +44,7 @@ def test_key_generation_check(family, ):
     start_time = datetime.utcnow()
     public_key, private_key = generate_keys(family, )
 
-    keypair_valid = check_key_pair(family, private_key, public_key)
+    keypair_valid = verify_key_pair(family, private_key, public_key)
     duration = (datetime.utcnow() - start_time)
 
     mark(

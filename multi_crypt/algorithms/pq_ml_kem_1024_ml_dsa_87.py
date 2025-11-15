@@ -69,7 +69,7 @@ def generate_keys(keylength: int = None, **kwargs) -> tuple[bytes, bytes]:
     return generate_bundled_keys(_CONFIG)
 
 
-def check_key_pair(private_key: bytes, public_key: bytes) -> bool:
+def verify_key_pair(private_key: bytes, public_key: bytes) -> bool:
     """Check if a private key and public key form a valid keypair.
 
     Args:

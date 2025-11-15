@@ -11,7 +11,7 @@ It provides exactly three pairs of functions to the user:
 
 - `encrypt` & `decrypt`
 - `sign` & `verify_signature`
-- `generate_keys` & `derive_public_key`
+- `generate_keys` & `verify_key_pair`
 
 Each of these functions takes the fundamental cryptographic algorithm family to be used as a parameter.
 `encrypt` and `decrypt` can additionally take a configuration string specifying additional algorithms and protocols to be used for hybrid encryption.
@@ -40,7 +40,9 @@ This library aims to abstract away these details as much as possible to provide 
 This library is subject to breaking changes to improve the API.
 Feel free to provide feedback (Github issues/discussions).
 
-Can it really be that nobody else hasn't built a library or standards like this before? I searched but maybe I'm not good enough! Please let me know if you do! (Github issues/discussions)
+Can it really be that nobody else hasn't built a library or standards like this before?
+I searched but maybe I'm not good enough!
+Please let me know if you do! (Github issues/discussions)
 
 ### Cryptographic Algorithm Families
 

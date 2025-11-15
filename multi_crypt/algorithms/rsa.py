@@ -36,7 +36,7 @@ def generate_keys(keylength: int = DEFAULT_KEY_LENGTH):
     return (public_key, private_key)
 
 
-def check_key_pair(private_key: bytes, public_key: bytes) -> bool:
+def verify_key_pair(private_key: bytes, public_key: bytes) -> bool:
     """Check if a private key and public key form a valid keypair.
     Args:
         private_key (bytes): the private key

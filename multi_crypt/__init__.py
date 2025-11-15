@@ -3,7 +3,7 @@ modules and makes them available from the scope of the multi_crypt package."""
 
 from .multi_crypt import (
     generate_keys,
-    check_key_pair,
+    verify_key_pair,
     encrypt,
     decrypt,
     sign,

@@ -9,7 +9,7 @@ if True:
     sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
     from multi_crypt import Crypt
-    from multi_crypt import check_key_pair
+    from multi_crypt import verify_key_pair
 
 # pylint: disable=missing-function-docstring
 # pylint: disable=global-statement
@@ -48,7 +48,7 @@ def test_create_crypt(family, ):
     reconstructed_crypt = Crypt(family, crypt.private_key, crypt.public_key)
     duration = (datetime.utcnow() - start_time)
 
-    key_sanity = check_key_pair(family, crypt.private_key, crypt.public_key)
+    key_sanity = verify_key_pair(family, crypt.private_key, crypt.public_key)
     reconstruction_success = (
         crypt.private_key == reconstructed_crypt.private_key
         and crypt.public_key == reconstructed_crypt.public_key

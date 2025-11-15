@@ -7,7 +7,7 @@ Crypt implements all the functionality of multi_crypt.
 from typing import Type, TypeVar
 
 from .multi_crypt import (  # pylint:disable=unused-import
-    check_key_pair,
+    verify_key_pair,
     decrypt,
     encrypt,
     generate_keys,
@@ -73,7 +73,7 @@ class Crypt:
 
         if private_key:
             # Verify the key pair matches
-            if not check_key_pair(family, private_key, public_key):
+            if not verify_key_pair(family, private_key, public_key):
                 raise KeyMismatchError(
                     "The supplied private and public keys don't form a valid keypair."
                 )
@@ -136,7 +136,7 @@ class Crypt:
         # type checking private key
         private_key = to_bytes(private_key, "private_key")
 
-        if not check_key_pair(self.family, private_key, self.public_key):
+        if not verify_key_pair(self.family, private_key, self.public_key):
             raise KeyMismatchError(
                 (
                     "Wrong private key! The given private key does not match this "
